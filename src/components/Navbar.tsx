@@ -42,7 +42,7 @@ export function Navbar() {
 
           {/* PRODUCTS */}
           <MenubarMenu>
-            <MenubarTrigger>Products</MenubarTrigger>
+            <MenubarTrigger >Products</MenubarTrigger>
             <MenubarContent>
               <MenubarGroup>
                 <MenubarItem>
