@@ -1,14 +1,10 @@
 import mongoose from 'mongoose';
 
 const UserSchema = new mongoose.Schema({
-  name: { 
-    type: String, 
-    trim: true 
-  },
   email: { 
     type: String, 
     unique: true, 
-    sparse: true, // Zaroori: Taaki phone-only users ke liye null conflict na ho
+    sparse: true, 
     lowercase: true 
   },
   phoneNumber: { 

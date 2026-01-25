@@ -19,4 +19,24 @@ export const logger = {
             JSON.stringify({ level: "WARN", timestamp: new Date().toISOString(), message, meta })
         );
     },
+    apiError: (context: string, error?: unknown) => {
+        console.error(
+            JSON.stringify({
+                level: "API_ERROR",
+                timestamp: new Date().toISOString(),
+                context,
+                error: error instanceof Error ? error.stack : error,
+            })
+        );
+    },
+    routerError: (context: string, error?: unknown) => {
+        console.error(
+            JSON.stringify({
+                level: "ROUTER_ERROR",
+                timestamp: new Date().toISOString(),
+                context,
+                error: error instanceof Error ? error.stack : error,
+            })
+        );
+    },
 };

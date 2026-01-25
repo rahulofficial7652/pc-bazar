@@ -11,7 +11,7 @@ export const handleRouteError = (error: unknown, context?: string) => {
     if (error instanceof AppError) {
         // Operational Error: safe to return code + message to client
         // Log logic for internal tracking (server-side only)
-        logger.error(`[AppError] ${context || 'Unknown Context'} - ${error.code}`, {
+        logger.apiError(`[AppError] ${context || 'Unknown Context'} - ${error.code}`, {
             statusCode: error.statusCode,
             message: error.message,
             meta: error.meta,
@@ -28,7 +28,7 @@ export const handleRouteError = (error: unknown, context?: string) => {
     const errorStack = isError ? error.stack : undefined;
 
     // Log full details for developers
-    logger.error(`[SystemError] ${context || 'Unknown Context'}`, {
+    logger.apiError(`[SystemError] ${context || 'Unknown Context'}`, {
         message: errorMessage,
         stack: errorStack,
         original: error,

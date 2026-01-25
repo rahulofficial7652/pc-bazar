@@ -26,7 +26,7 @@ export function Navbar() {
         
         {/* LEFT – LOGO */}
         <div className="text-xl font-bold tracking-tight">
-          Bit<span className="text-violet-600">Kart</span>
+          PC<span className="text-violet-600"> Bazzar</span>
         </div>
 
         {/* CENTER – MENUBAR */}
