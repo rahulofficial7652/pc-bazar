@@ -3,7 +3,7 @@ import mongoose from "mongoose"
 const CategorySchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
-    slug: { type: String, required: true, unique: true }, // keyboard, mouse
+    slug: { type: String, required: true, unique: true, trim:true }, // keyboard, mouse
   },
   { timestamps: true }
 )

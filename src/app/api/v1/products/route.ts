@@ -69,7 +69,7 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
   try {
     await connectDB();
-    const { searchParams } = new URL(req.url);
+    const { searchParams } = new URL(req.url);  
     const categorySlug = searchParams.get("category");
     const showAll = searchParams.get("showAll") === "true";
 
