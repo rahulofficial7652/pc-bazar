@@ -18,6 +18,7 @@ import {
   LogInIcon,
 } from "lucide-react"
 import { ModeToggle } from "./theme/ModeToggle"
+import Link from "next/link"
 
 export function Navbar() {
   return (
@@ -80,14 +81,18 @@ export function Navbar() {
               Account
             </MenubarTrigger>
             <MenubarContent align="end">
+              <Link href="/login">
               <MenubarItem>
                 <LogInIcon className="mr-2 h-4 w-4" />
                 Login
               </MenubarItem>
+              </Link>
               <MenubarSeparator />
+              <Link href="/signup">
               <MenubarItem>
                 Register
               </MenubarItem>
+              </Link>
             </MenubarContent>
           </MenubarMenu>
         </Menubar>

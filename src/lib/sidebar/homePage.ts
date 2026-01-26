@@ -1,16 +1,39 @@
 "use client"
 
 import React from "react"
-import { Home, Inbox } from "lucide-react"
-import { AppSidebar } from "@/components/app-sidebar"
+import { Gauge, Inbox, ShoppingCart,Package, User, Settings } from "lucide-react"
+import { AppSidebar } from "@/components/sidebar/app-sidebar"
 
 const dashboardItems = [
-  { title: "Home", url: "/", icon: Home },
-  { title: "Inbox", url: "/inbox", icon: Inbox },
+  { 
+    title: "Dashboard", 
+    url: "/admin",
+    icon: Gauge
+  },
+
+  {
+    title: "Product",
+    url: "/admin/products",
+    icon: ShoppingCart 
+  },
+  {
+    title: "All Order",
+    url: "/inbox",
+    icon: Package 
+  },{
+    title: "All User",
+    url: "/inbox",
+    icon: User 
+  },
+  {
+    title: "Settings",
+    url: "/inbox",
+    icon: Settings 
+  },
 ]
 
 export function AdminPageSidebar() {``
   return (
-    React.createElement(AppSidebar, { items: dashboardItems, label: "" })
+    React.createElement(AppSidebar, { items: dashboardItems, label: "Admin" })
   )
 }
