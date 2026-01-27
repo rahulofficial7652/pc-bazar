@@ -39,7 +39,10 @@ export default function RootLayout({
           <LayoutManager>
             {children}
           </LayoutManager>
-          <Toaster position="bottom-right" />
+          <Toaster
+          position="bottom-right"
+          richColors
+          />
         </ThemeProvider>
       </body>
     </html>

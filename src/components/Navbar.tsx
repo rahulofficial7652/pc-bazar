@@ -7,7 +7,7 @@ import {
   MenubarSeparator,
   MenubarTrigger,
 } from "@/components/ui/menubar"
-
+import Image from "next/image"
 import {
   HomeIcon,
   ShoppingCartIcon,
@@ -26,9 +26,10 @@ export function Navbar() {
       <div className="mx-auto max-w-7xl px-6 h-14 flex items-center justify-between">
         
         {/* LEFT – LOGO */}
-        <div className="text-xl font-bold tracking-tight">
-          PC<span className="text-violet-600"> Bazzar</span>
-        </div>
+        <Link href="/">
+         <Image src="/logo.jpeg" alt="Logo" width={40} height={40} className=""/>
+        </Link>
+   
 
         {/* CENTER – MENUBAR */}
         <Menubar className="border-none shadow-none">

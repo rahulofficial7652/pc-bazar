@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { Category } from "@/models/category";
+import { Category } from "@/lib/db/models/category";
 import { connectDB } from "@/lib/db";
-import { ApiResponse } from "@/lib/api-response";
+import { ApiResponse } from "@/lib/utils/apiResponse";
 
 export async function POST(req: Request) {
   try {

@@ -34,7 +34,7 @@ export const authOptions: NextAuthOptions = {
                 // 2. Check Database for regular users
                 try {
                     const { connectDB } = await import("@/lib/db");
-                    const User = (await import("@/models/user")).default;
+                    const User = (await import("@/lib/db/models/user")).default;
                     const bcrypt = (await import("bcryptjs")).default;
 
                     await connectDB();
@@ -58,7 +58,7 @@ export const authOptions: NextAuthOptions = {
                         role: user.role,
                     };
                 } catch (error) {
-                    const { logger } = await import("@/lib/logger");
+                    const { logger } = await import("@/lib/utils/logger");
                     logger.apiError("CredentialsAuthorize", error);
                     return null;
                 }
@@ -76,8 +76,8 @@ export const authOptions: NextAuthOptions = {
             if (account?.provider === "google") {
                 try {
                     const { connectDB } = await import("@/lib/db");
-                    const User = (await import("@/models/user")).default;
-                    const { logger } = await import("@/lib/logger");
+                    const User = (await import("@/lib/db/models/user")).default;
+                    const { logger } = await import("@/lib/utils/logger");
                     await connectDB();
 
                     const existingUser = await User.findOne({ email: user.email });
@@ -91,7 +91,7 @@ export const authOptions: NextAuthOptions = {
                     }
                     return true;
                 } catch (error) {
-                    const { logger } = await import("@/lib/logger");
+                    const { logger } = await import("@/lib/utils/logger");
                     logger.apiError("GoogleSignInCallback", error);
                     return false;
                 }
@@ -106,7 +106,7 @@ export const authOptions: NextAuthOptions = {
             if (account?.provider === "google" && token.email) {
                 try {
                     const { connectDB } = await import("@/lib/db");
-                    const User = (await import("@/models/user")).default;
+                    const User = (await import("@/lib/db/models/user")).default;
                     await connectDB();
                     const dbUser = await User.findOne({ email: token.email });
                     if (dbUser) {
@@ -114,7 +114,7 @@ export const authOptions: NextAuthOptions = {
                         token.role = dbUser.role;
                     }
                 } catch (error) {
-                    const { logger } = await import("@/lib/logger");
+                    const { logger } = await import("@/lib/utils/logger");
                     logger.apiError("JWTCallback_Google", error);
                 }
             }

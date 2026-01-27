@@ -1,114 +1,112 @@
-import { NextResponse } from "next/server";
-import { Product } from "@/models/product";
+import { NextRequest } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth"; // Already correct
 import { connectDB } from "@/lib/db";
-import { logger } from "@/lib/logger";
-import { Category } from "@/models/category";
+import { Product } from "@/lib/db/models/product";
+import { ApiResponse } from "@/lib/utils/apiResponse";
+import { handleRouteError } from "@/lib/errors/handleRouteError";
 import { AppError } from "@/lib/errors/AppError";
 import { ERROR_CODES } from "@/lib/errors/errorCodes";
-import { handleRouteError } from "@/lib/errors/handleRouteError";
 
-export async function GET(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+interface RouteParams {
+  params: Promise<{
+    id: string;
+  }>;
+}
+
+// GET a single product by ID
+export async function GET(req: NextRequest, { params }: RouteParams) {
   try {
     await connectDB();
     const { id } = await params;
+
     const product = await Product.findById(id).populate("category");
-
-    if (!product) {
+    if (!product || !product.isActive) {
       throw new AppError({
-        statusCode: 404,
         code: ERROR_CODES.RESOURCE_NOT_FOUND,
-        message: "Product not found",
-        meta: { id },
+        message: "Product not found.",
+        statusCode: 404,
       });
     }
 
-    return NextResponse.json({ success: true, data: product });
+    return ApiResponse.success(product);
   } catch (error) {
-    return handleRouteError(error, `GET /api/v1/products/${(await params).id}`);
+    return handleRouteError(error, "Failed to fetch product");
   }
 }
 
-export async function PUT(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+// UPDATE a product by ID
+export async function PUT(req: NextRequest, { params }: RouteParams) {
   try {
     await connectDB();
     const { id } = await params;
+
+    const session = await getServerSession(authOptions);
+    // @ts-ignore
+    if (!session || session.user?.role !== "ADMIN") {
+      throw new AppError({
+        code: ERROR_CODES.UNAUTHORIZED,
+        message: "Unauthorized",
+        statusCode: 401,
+      });
+    }
+
     const body = await req.json();
-    const { category: categorySlug, ...updateData } = body;
 
-    logger.info("Attempting to update product", { id, updateData });
+    const updatedProduct = await Product.findByIdAndUpdate(id, body, {
+      new: true,
+      runValidators: true,
+    });
 
-    // resolving category slug to ID if provided
-    if (categorySlug) {
-      const category = await Category.findOne({ slug: categorySlug });
-      if (!category) {
-        throw new AppError({
-          statusCode: 400,
-          code: ERROR_CODES.VALIDATION_ERROR,
-          message: "Invalid Category",
-          meta: { categorySlug },
-        });
-      }
-      // @ts-ignore
-      updateData.category = category._id;
-    }
-
-    const product = await Product.findByIdAndUpdate(
-      id,
-      { $set: updateData },
-      { new: true, runValidators: true }
-    );
-
-    if (!product) {
+    if (!updatedProduct) {
       throw new AppError({
-        statusCode: 404,
         code: ERROR_CODES.RESOURCE_NOT_FOUND,
-        message: "Product to update not found",
-        meta: { id },
+        message: "Product not found for updating.",
+        statusCode: 404,
       });
     }
 
-    logger.info("Product updated successfully", { id });
-    return NextResponse.json({ success: true, data: product });
+    return ApiResponse.success(updatedProduct, "Product updated successfully");
   } catch (error) {
-    return handleRouteError(error, `PUT /api/v1/products/${(await params).id}`);
+    return handleRouteError(error, "Failed to update product");
   }
 }
 
-export async function DELETE(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+// SOFT DELETE a product by ID
+export async function DELETE(req: NextRequest, { params }: RouteParams) {
   try {
     await connectDB();
     const { id } = await params;
 
-    logger.info("Attempting to delete product", { id });
+    const session = await getServerSession(authOptions);
+    // @ts-ignore
+    if (!session || session.user?.role !== "ADMIN") {
+      throw new AppError({
+        code: ERROR_CODES.UNAUTHORIZED,
+        message: "Unauthorized",
+        statusCode: 401,
+      });
+    }
 
-    // Soft delete: set isActive to false
-    const product = await Product.findByIdAndUpdate(
+    const deletedProduct = await Product.findByIdAndUpdate(
       id,
       { isActive: false },
-      { new: true }
+      { new: true },
     );
 
-    if (!product) {
+    if (!deletedProduct) {
       throw new AppError({
-        statusCode: 404,
         code: ERROR_CODES.RESOURCE_NOT_FOUND,
-        message: "Product to delete not found",
-        meta: { id },
+        message: "Product not found for deletion.",
+        statusCode: 404,
       });
     }
 
-    logger.info("Product soft deleted successfully", { id });
-    return NextResponse.json({ success: true, message: "Product soft deleted", data: { deleted: true } });
+    return ApiResponse.success(
+      { deletedProductId: id },
+      "Product deleted successfully",
+    );
   } catch (error) {
-    return handleRouteError(error, `DELETE /api/v1/products/${(await params).id}`);
+    return handleRouteError(error, "Failed to delete product");
   }
 }

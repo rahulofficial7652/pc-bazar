@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { logger } from "@/lib/logger";
+import { logger } from "@/lib/utils/logger";
 
 type ApiResponseOptions = {
     status?: number;
@@ -18,13 +18,24 @@ export const ApiResponse = {
 
     error: (message: string, error?: unknown, status: number = 500) => {
         // 1. Log detailed error to terminal for Developer
-        logger.error(`[API ERROR] ${message}`, error);
+        const timestamp = new Date().toISOString();
+        const color = "\x1b[31m"; // Red
+        const reset = "\x1b[0m";
+
+        console.error(`\n${color}=================================================${reset}`);
+        console.error(`${color}[${timestamp}] API RESPONSE ERROR${reset}`);
+        console.error(`${color}MESSAGE: ${message}${reset}`);
         if (error instanceof Error) {
-            console.error("\x1b[31m%s\x1b[0m", "[STACK TRACE]:", error.stack); // Red color for visibility
+            console.error(`${color}STACK:${reset}`);
+            console.error(error.stack);
+        } else if (error) {
+             console.error(`${color}DETAILS:${reset}`, error);
         }
+        console.error(`${color}=================================================${reset}\n`);
+
+        logger.error(`[API ERROR] ${message}`, error);
 
         // 2. Return user-friendly error to Client
-        // Hide internal server errors in production if needed, but for now show message
         return NextResponse.json(
             { success: false, message: message },
             { status }
