@@ -42,10 +42,10 @@ export default function ClientProductsPage() {
                 )}
             </div>
             <CardHeader>
-              <CardTitle className="line-clamp-1">{product.name}</CardTitle>
+              <CardTitle className="">{product.name}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">${product.price}</p>
+              <p className="text-2xl font-bold">₹{product.price}</p>
               <p className="text-sm text-muted-foreground line-clamp-2 mt-2">{product.description}</p>
             </CardContent>
             <CardFooter>

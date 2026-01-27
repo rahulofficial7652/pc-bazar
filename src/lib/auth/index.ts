@@ -11,8 +11,8 @@ export const authOptions: NextAuthOptions = {
         CredentialsProvider({
             name: "Admin Login",
             credentials: {
-                email: { label: "Email", type: "email", placeholder: "admin@example.com" },
-                password: { label: "Password", type: "password" },
+                email: { label: "Email", type: "email", placeholder: "youremail@example.com" },
+                password: { label: "Password", type: "password", placeholder: "Enter your password" },
             },
             async authorize(credentials) {
                 if (!credentials?.email || !credentials?.password) {
@@ -77,7 +77,6 @@ export const authOptions: NextAuthOptions = {
                 try {
                     const { connectDB } = await import("@/lib/db");
                     const User = (await import("@/lib/db/models/user")).default;
-                    const { logger } = await import("@/lib/utils/logger");
                     await connectDB();
 
                     const existingUser = await User.findOne({ email: user.email });

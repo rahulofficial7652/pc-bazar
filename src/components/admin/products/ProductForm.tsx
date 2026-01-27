@@ -115,7 +115,7 @@ export function ProductForm({
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="price">Price ($) *</Label>
+                            <Label htmlFor="price">Price (₹) *</Label>
                             <Input
                                 id="price"
                                 type="number"
@@ -124,7 +124,7 @@ export function ProductForm({
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="discountPrice">Discount Price ($)</Label>
+                            <Label htmlFor="discountPrice">Discount Price (₹)</Label>
                             <Input
                                 id="discountPrice"
                                 type="number"

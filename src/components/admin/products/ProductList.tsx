@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Trash2, SquarePen } from "lucide-react";
 import { apiClient } from "@/lib/frontend/api-client";
 import { useState } from "react";
 import Image from "next/image";
@@ -31,6 +31,11 @@ interface ProductListProps {
 
 export function ProductList({ products, onRefresh }: ProductListProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [edit, setEdit] = useState<string | null>(null);
+
+  const handleEdit = (id: string) => {
+    setEdit(id);
+  };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this product?")) return;
@@ -53,8 +58,9 @@ export function ProductList({ products, onRefresh }: ProductListProps) {
           <TableRow>
             <TableHead>Image</TableHead>
             <TableHead>Name</TableHead>
+            <TableHead>Slug</TableHead>
             <TableHead>Category</TableHead>
-            <TableHead>Price</TableHead>
+            <TableHead>Price (INR)</TableHead>
             <TableHead>Stock</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
@@ -79,11 +85,13 @@ export function ProductList({ products, onRefresh }: ProductListProps) {
                     )}
                 </TableCell>
                 <TableCell className="font-medium">{product.name}</TableCell>
+                <TableCell>{product.slug}</TableCell>
                 <TableCell>{product.category?.name || "N/A"}</TableCell>
-                <TableCell>${product.price}</TableCell>
+                <TableCell>{product.price}</TableCell>
                 <TableCell>{product.stock}</TableCell>
                 <TableCell className="text-right">
-                  <Button
+                 <div className="flex flex-row gap-2 justify-end">
+                   <Button
                     variant="destructive"
                     size="icon"
                     onClick={() => handleDelete(product._id)}
@@ -91,6 +99,15 @@ export function ProductList({ products, onRefresh }: ProductListProps) {
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    onClick={() => handleEdit(product._id)}
+                    
+                  >
+                    <SquarePen className="h-4 w-4" />
+                  </Button>
+                 </div>
                 </TableCell>
               </TableRow>
             ))

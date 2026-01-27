@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { Product } from "@/lib/db/models/product";
+import { Category } from "@/lib/db/models/category";
 import { ApiResponse } from "@/lib/utils/apiResponse";
 import { handleRouteError } from "@/lib/errors/handleRouteError";
 import { AppError } from "@/lib/errors/AppError";
@@ -82,7 +83,7 @@ export async function GET(req: NextRequest) {
         const sortOptions: any = { [sortBy]: order === "asc" ? 1 : -1 };
 
         const products = await Product.find(query)
-            .populate("category")
+            .populate({ path: "category", model: Category })
             .sort(sortOptions)
             .skip((page - 1) * limit)
             .limit(limit);
