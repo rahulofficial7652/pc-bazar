@@ -37,11 +37,11 @@ export async function POST(req: NextRequest) {
             });
         }
 
-        const existingProduct = await Product.findOne({ slug });
+        const existingProduct = await Product.findOne({ name, slug, category });
         if (existingProduct) {
             throw new AppError({
                 code: ERROR_CODES.DUPLICATE_RESOURCE,
-                message: "Product with this slug already exists",
+                message: "This item already exists.",
                 statusCode: 409
             });
         }

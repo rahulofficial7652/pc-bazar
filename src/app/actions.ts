@@ -1,6 +1,6 @@
 "use server";
 
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary, UploadApiResponse, UploadApiErrorResponse } from 'cloudinary';
 
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -17,14 +17,28 @@ export async function uploadImage(formData: FormData) {
   const arrayBuffer = await file.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
 
-  // Cloudinary par upload karna
-  const result = await new Promise<any>((resolve, reject) => {
-    cloudinary.uploader.upload_stream({ 
-      folder: 'pc-bazar-products' 
-    }, (error, result) => {
-      if (error) reject(error);
-      resolve(result);
-    }).end(buffer);
+  // Cloudinary par upload karna (With Type Safety and Compression)
+  const result = await new Promise<UploadApiResponse>((resolve, reject) => {
+    cloudinary.uploader.upload_stream(
+      { 
+        folder: 'pc-bazar-products',
+        // Compression settings jo humne discuss ki thi
+        transformation: [
+          { width: 1200, crop: "limit" },
+          { quality: "auto" },
+          { fetch_format: "auto" }
+        ]
+      }, 
+      (error: UploadApiErrorResponse | undefined, result: UploadApiResponse | undefined) => {
+        if (error) {
+          return reject(error);
+        }
+        if (!result) {
+          return reject(new Error("Upload failed: No result from Cloudinary"));
+        }
+        resolve(result);
+      }
+    ).end(buffer);
   });
 
   return { url: result.secure_url }; // Image ka URL return karna

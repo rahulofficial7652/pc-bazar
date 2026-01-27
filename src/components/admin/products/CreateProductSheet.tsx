@@ -24,6 +24,7 @@ import { Plus, X, Upload } from "lucide-react";
 import { apiClient } from "@/lib/frontend/api-client";
 import { uploadImage } from "@/app/actions";
 import { toast } from "sonner";
+import imageCompression from 'browser-image-compression';
 
 interface CreateProductSheetProps {
   onSuccess: () => void;
@@ -202,12 +203,20 @@ export function CreateProductSheet({ onSuccess }: CreateProductSheetProps) {
                     const file = e.target.files?.[0];
                     if (!file) return;
                     
-                    const formData = new FormData();
-                    formData.append("image", file);
-                    
-                    const toastId = toast.loading("Uploading image...");
+                    const toastId = toast.loading("Compressing & Uploading image...");
                     
                     try {
+                        const options = {
+                            maxSizeMB: 1,
+                            maxWidthOrHeight: 1920,
+                            useWebWorker: true
+                        };
+                        
+                        const compressedFile = await imageCompression(file, options);
+                        
+                        const formData = new FormData();
+                        formData.append("image", compressedFile);
+                        
                         const res = await uploadImage(formData);
                         setImages([...images, res.url]);
                         toast.success("Image uploaded successfully", { id: toastId });
