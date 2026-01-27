@@ -1,36 +1,62 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { Category } from "@/lib/db/models/category";
 import { connectDB } from "@/lib/db";
 import { ApiResponse } from "@/lib/utils/apiResponse";
+import { AppError } from "@/lib/errors/AppError";
+import { ERROR_CODES } from "@/lib/errors/errorCodes";
+import { handleRouteError } from "@/lib/errors/handleRouteError";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     await connectDB();
+    
+    // Auth Check
+    const session = await getServerSession(authOptions);
+    // @ts-ignore
+    if (!session || session.user?.role !== "ADMIN") {
+        throw new AppError({
+            code: ERROR_CODES.UNAUTHORIZED,
+            message: "Unauthorized access",
+            statusCode: 401
+        });
+    }
+
     const body = await req.json();
     const { name, slug } = body;
 
     if (!name || !slug) {
-      return ApiResponse.error("Name and slug are required", { body }, 400);
+        throw new AppError({
+            code: ERROR_CODES.INVALID_INPUT,
+            message: "Name and slug are required",
+            statusCode: 400
+        });
     }
 
     const existingCategory = await Category.findOne({ slug });
     if (existingCategory) {
-      return ApiResponse.error("Category with this slug already exists", { slug }, 409);
+        throw new AppError({
+            code: ERROR_CODES.DUPLICATE_RESOURCE,
+            message: "Category with this slug already exists",
+            statusCode: 409
+        });
     }
 
-    const category = await Category.create({ name, slug });
+    const category = await Category.create({ name, slug, isActive: true });
     return ApiResponse.success(category, "Category created successfully", 201);
   } catch (error) {
-    return ApiResponse.error("Internal Server Error creating category", error);
+    return handleRouteError(error, "CreateCategory");
   }
 }
 
 export async function GET() {
   try {
     await connectDB();
-    const categories = await Category.find();
+    // Only return active categories for public list
+    const categories = await Category.find({ isActive: true }).sort({ createdAt: -1 });
     return ApiResponse.success(categories);
   } catch (error) {
-    return ApiResponse.error("Internal Server Error fetching categories", error);
+    return handleRouteError(error, "GetCategories");
   }
 }

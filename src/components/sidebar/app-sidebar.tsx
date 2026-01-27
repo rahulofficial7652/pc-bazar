@@ -33,7 +33,7 @@ export function AppSidebar({ items, label}: AppSidebarProps) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="/">
+              <Link href="/admin">
                 <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                   <Image src="/logo.jpeg" alt="Logo" width={32} height={32} />
                 </div>
@@ -41,7 +41,7 @@ export function AppSidebar({ items, label}: AppSidebarProps) {
                   <span className=" text-lg font-bold mt-2">Admin</span>
                   
                 </div>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

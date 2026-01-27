@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Menubar,
   MenubarContent,
@@ -16,11 +18,17 @@ import {
   HeadphonesIcon,
   UserIcon,
   LogInIcon,
+  LogOutIcon,
+  LayoutDashboardIcon,
 } from "lucide-react"
 import { ModeToggle } from "./theme/ModeToggle"
 import Link from "next/link"
+import { useSession, signOut } from "next-auth/react"
 
 export function Navbar() {
+  const { data: session, status } = useSession();
+  const isLoading = status === "loading";
+
   return (
     <header className="w-full border-b fixed top-0 z-50 shadow-sm bg-transparent  backdrop-filter backdrop-blur-sm">
       <div className="mx-auto max-w-7xl px-6 h-14 flex items-center justify-between">
@@ -79,21 +87,43 @@ export function Navbar() {
           <MenubarMenu>
             <MenubarTrigger className="gap-2">  
               <UserIcon size={16} />
-              Account
+              {isLoading ? "..." : session ? "My Account" : "Account"}
             </MenubarTrigger>
             <MenubarContent align="end">
-              <Link href="/login">
-              <MenubarItem>
-                <LogInIcon className="mr-2 h-4 w-4" />
-                Login
-              </MenubarItem>
-              </Link>
-              <MenubarSeparator />
-              <Link href="/signup">
-              <MenubarItem>
-                Register
-              </MenubarItem>
-              </Link>
+              {session ? (
+                <>
+                  <div className="px-2 py-1.5 text-sm font-medium">
+                    {session.user?.name || session.user?.email}
+                  </div>
+                  <MenubarSeparator />
+                  <Link href="/dashboard">
+                    <MenubarItem>
+                      <LayoutDashboardIcon className="mr-2 h-4 w-4" />
+                      Dashboard
+                    </MenubarItem>
+                  </Link>
+                  <MenubarSeparator />
+                  <MenubarItem onClick={() => signOut({ callbackUrl: "/" })}>
+                    <LogOutIcon className="mr-2 h-4 w-4" />
+                    Logout
+                  </MenubarItem>
+                </>
+              ) : (
+                <>
+                  <Link href="/login">
+                    <MenubarItem>
+                      <LogInIcon className="mr-2 h-4 w-4" />
+                      Login
+                    </MenubarItem>
+                  </Link>
+                  <MenubarSeparator />
+                  <Link href="/signup">
+                    <MenubarItem>
+                      Register
+                    </MenubarItem>
+                  </Link>
+                </>
+              )}
             </MenubarContent>
           </MenubarMenu>
         </Menubar>

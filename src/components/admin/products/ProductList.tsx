@@ -1,95 +1,102 @@
-import { Button } from "@/components/ui/button";
+"use client";
+
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
-import { Edit, Plus, Trash2 } from "lucide-react";
-import { Product, Category } from "@/types";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
+import { apiClient } from "@/lib/frontend/api-client";
+import { useState } from "react";
+import Image from "next/image";
 
-
-interface ProductListProps {
-    products: Product[];
-    onAdd: () => void;
-    onEdit: (product: Product) => void;
-    onDelete: (id: string) => void;
+interface Product {
+  _id: string;
+  name: string;
+  slug: string;
+  price: number;
+  stock: number;
+  category: { name: string } | null;
+  images: string[];
 }
 
-export function ProductList({ products, onAdd, onEdit, onDelete }: ProductListProps) {
-    return (
-        <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-bold">Products</h1>
-                <Button onClick={onAdd}>
-                    <Plus className="mr-2 h-4 w-4" /> Add Product
-                </Button>
-            </div>
+interface ProductListProps {
+  products: Product[];
+  onRefresh: () => void;
+}
 
-            <div className="border rounded-lg">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Category</TableHead>
-                            <TableHead>Price</TableHead>
-                            <TableHead>Stock</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {products.length === 0 && (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={5}
-                                    className="text-center py-8 text-muted-foreground"
-                                >
-                                    No products found. Add one to get started.
-                                </TableCell>
-                            </TableRow>
-                        )}
-                        {products.map((p) => (
-                            <TableRow key={p._id}>
-                                <TableCell className="font-medium">
-                                    {p.name}
-                                    {!p.isActive && (
-                                        <span className="ml-2 px-2 py-0.5 text-xs bg-red-100 text-red-800 rounded-full">
-                                            Deleted
-                                        </span>
-                                    )}
-                                </TableCell>
-                                <TableCell>
-                                    {typeof p.category === "object"
-                                        ? (p.category as Category).name
-                                        : "Unknown"}
-                                </TableCell>
-                                <TableCell>${p.price}</TableCell>
-                                <TableCell>{p.stock}</TableCell>
-                                <TableCell className="text-right space-x-2">
-                                    <Button
-                                        variant="outline"
-                                        size="icon"
-                                        onClick={() => onEdit(p)}
-                                    >
-                                        <Edit className="h-4 w-4" />
-                                    </Button>
-                                    <Button
-                                        variant="destructive"
-                                        size="icon"
-                                        onClick={() => onDelete(p._id)}
-                                        disabled={!p.isActive}
-                                        title={!p.isActive ? "Already deleted" : "Delete"}
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </div>
-        </div>
-    );
+export function ProductList({ products, onRefresh }: ProductListProps) {
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this product?")) return;
+    
+    setDeletingId(id);
+    const res = await apiClient(`/api/v1/products/${id}`, {
+      method: "DELETE",
+    });
+    setDeletingId(null);
+
+    if (res) {
+      onRefresh();
+    }
+  };
+
+  return (
+    <div className="border rounded-md">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Image</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Category</TableHead>
+            <TableHead>Price</TableHead>
+            <TableHead>Stock</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {products.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={6} className="text-center h-24">
+                No products found.
+              </TableCell>
+            </TableRow>
+          ) : (
+            products.map((product) => (
+              <TableRow key={product._id}>
+                <TableCell>
+                    {product.images?.[0] ? (
+                        <div className="relative w-8 h-8 rounded overflow-hidden">
+                             <Image src={product.images[0]} alt={product.name} fill className="object-cover" />
+                        </div>
+                    ) : (
+                        <div className="w-8 h-8 bg-muted rounded" />
+                    )}
+                </TableCell>
+                <TableCell className="font-medium">{product.name}</TableCell>
+                <TableCell>{product.category?.name || "N/A"}</TableCell>
+                <TableCell>${product.price}</TableCell>
+                <TableCell>{product.stock}</TableCell>
+                <TableCell className="text-right">
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    onClick={() => handleDelete(product._id)}
+                    disabled={deletingId === product._id}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+        </TableBody>
+      </Table>
+    </div>
+  );
 }

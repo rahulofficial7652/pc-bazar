@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 
 export function Footer() {
   return (
@@ -6,10 +7,10 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-6 py-16 grid gap-12 md:grid-cols-4">
 
         {/* BRAND */}
-        <div>
-          <h3 className="text-lg font-semibold text-foreground">
-            Bit<span className="text-primary">Kart</span>
-          </h3>
+        <div className="flex flex-col items-center justify-center">
+          <Link href="/">
+            <Image src="/logo.jpeg" alt="Logo" width={50} height={50} className="rounded-full center mr-10"/>
+          </Link>
           <p className="mt-4 text-sm text-muted-foreground max-w-xs">
             Your one-stop shop for custom PCs, peripherals,
             and high-performance hardware.
@@ -60,10 +61,7 @@ export function Footer() {
       <div className="border-t">
         <div className="mx-auto max-w-7xl px-6 py-6 text-sm text-muted-foreground flex flex-col md:flex-row items-center justify-between gap-4">
           <p>
-            © {new Date().getFullYear()} BitKart. All rights reserved.
-          </p>
-          <p>
-            Built with ❤️ using modern web technologies
+            © {new Date().getFullYear()} pc Bazzar. All rights reserved.
           </p>
         </div>
       </div>
