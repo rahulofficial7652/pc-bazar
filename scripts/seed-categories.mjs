@@ -1,4 +1,10 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Current directory se .env ka rasta nikaalein
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+
 
 async function checkCategories() {
     try {
@@ -27,7 +33,7 @@ async function checkCategories() {
                 { name: "Storage", slug: "storage" },
                 { name: "Monitors", slug: "monitors" },
                 { name: "Keyboards", slug: "keyboards" },
-                { name: "Mice", slug: "mice" }
+                { name: "Mice", slug: "mice" },
                 { name: "Processors", slug: "mice" }
                 
 

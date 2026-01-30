@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth"; // Already correct
 import { connectDB } from "@/lib/db";
-import { Product } from "@/lib/db/models/product";
+import { Product } from "@/models/product";
 import { ApiResponse } from "@/lib/utils/apiResponse";
 import { handleRouteError } from "@/lib/errors/handleRouteError";
 import { AppError } from "@/lib/errors/AppError";

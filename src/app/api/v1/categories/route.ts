@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { Category } from "@/lib/db/models/category";
+import { Category } from "@/models/category";
 import { connectDB } from "@/lib/db";
 import { ApiResponse } from "@/lib/utils/apiResponse";
 import { AppError } from "@/lib/errors/AppError";

@@ -34,7 +34,7 @@ export const authOptions: NextAuthOptions = {
                 // 2. Check Database for regular users
                 try {
                     const { connectDB } = await import("@/lib/db");
-                    const User = (await import("@/lib/db/models/user")).default;
+                    const User = (await import("@/models/user")).default;
                     const bcrypt = (await import("bcryptjs")).default;
 
                     await connectDB();
@@ -76,7 +76,7 @@ export const authOptions: NextAuthOptions = {
             if (account?.provider === "google") {
                 try {
                     const { connectDB } = await import("@/lib/db");
-                    const User = (await import("@/lib/db/models/user")).default;
+                    const User = (await import("@/models/user")).default;
                     await connectDB();
 
                     const existingUser = await User.findOne({ email: user.email });
@@ -105,7 +105,7 @@ export const authOptions: NextAuthOptions = {
             if (account?.provider === "google" && token.email) {
                 try {
                     const { connectDB } = await import("@/lib/db");
-                    const User = (await import("@/lib/db/models/user")).default;
+                    const User = (await import("@/models/user")).default;
                     await connectDB();
                     const dbUser = await User.findOne({ email: token.email });
                     if (dbUser) {
