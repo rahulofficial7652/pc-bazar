@@ -17,18 +17,18 @@ const dashboardItems = [
         icon: ShoppingCart
     },
     {
-        title: "All Order",
-        url: "/inbox",
+        title: "categories",
+        url: "/admin/categories",
         icon: Package
     },
     {
         title: "All User",
-        url: "/inbox",
+        url: "#",
         icon: User
     },
     {
         title: "Settings",
-        url: "/inbox",
+        url: "#",
         icon: Settings
     },
 ]
