@@ -48,7 +48,7 @@ export function Navbar() {
 
           {/* ALL PRODUCTS */}
           <MenubarMenu>
-            <Link href="/collection/products">
+            <Link href="/collection">
               <MenubarTrigger className="gap-2 cursor-pointer">
                 <HomeIcon size={16} />
                 All Products
@@ -72,7 +72,7 @@ export function Navbar() {
                   categories.map((category) => (
                     <Link
                       key={category._id}
-                      href={`/collection/products/category/${category.slug}`}
+                      href={`/collection/category/${category.slug}`}
                     >
                       <MenubarItem className="gap-2">
                         <PackageIcon size={14} />
@@ -183,7 +183,7 @@ export function Navbar() {
 
                   {/* All Products Link */}
                   <Link
-                    href="/collection/products"
+                    href="/collection"
                     className="flex items-center gap-2 text-base font-medium p-3 hover:bg-accent rounded-md transition-colors"
                   >
                     <PackageIcon size={20} /> All Products
@@ -207,7 +207,7 @@ export function Navbar() {
                         {categories.map((category) => (
                           <Link
                             key={category._id}
-                            href={`/collection/products/category/${category.slug}`}
+                            href={`/collection/category/${category.slug}`}
                             className="flex items-center justify-between gap-2 text-base font-medium p-3 pl-6 hover:bg-accent rounded-md transition-colors"
                           >
                             <span className="flex items-center gap-2">

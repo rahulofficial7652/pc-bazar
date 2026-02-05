@@ -1,10 +1,9 @@
 'use client'
 import { Button } from "@/components/ui/button"
-import { Categories } from "@/components/home/Categories"
 import { FeaturedProducts } from "@/components/home/FeaturedProducts"
 import Link from "next/link"
 
-import { featuredProducts, categories } from "@/lib/home";
+import { featuredProducts } from "@/lib/home";
 
 export default function HomePage() {
   return (
@@ -45,11 +44,14 @@ export default function HomePage() {
           </div>
 
           {/* RIGHT VISUAL */}
-          <div className="relative h-[320px] rounded-xl border bg-card shadow-sm" />
+          <div className="relative h-[320px] rounded-xl border bg-card shadow-sm" >
+
+          </div>
+
         </div>
       </section>
 
-      <Categories data={categories} />
+      {/* <Categories data={categories} /> */}
       <FeaturedProducts data={featuredProducts} />
     </main>
   )

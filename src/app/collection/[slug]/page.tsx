@@ -47,18 +47,18 @@ export default function ProductDetailPage() {
         const fetchProduct = async () => {
             setLoading(true);
             try {
-                const data = await apiClient<{ data: Product }>(
+                const data = await apiClient<Product>(
                     `/api/v1/products/${slug}`
                 );
-                if (data?.data) {
-                    setProduct(data.data);
+                if (data) {
+                    setProduct(data);
                 } else {
                     toast.error("Product not found");
-                    router.push("/collection/products");
+                    router.push("/collection");
                 }
             } catch (error) {
                 toast.error("Failed to load product");
-                router.push("/collection/products");
+                router.push("/collection");
             }
             setLoading(false);
         };
@@ -93,7 +93,7 @@ export default function ProductDetailPage() {
             <div className="border-b">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <Link
-                        href="/collection/products"
+                        href="/collection"
                         className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
                         <ArrowLeft className="h-4 w-4 mr-2" />
@@ -139,8 +139,8 @@ export default function ProductDetailPage() {
                                             key={index}
                                             onClick={() => setSelectedImage(index)}
                                             className={`relative aspect-square rounded-md overflow-hidden border-2 transition-all ${selectedImage === index
-                                                    ? "border-primary ring-2 ring-primary/20"
-                                                    : "border-transparent hover:border-muted-foreground"
+                                                ? "border-primary ring-2 ring-primary/20"
+                                                : "border-transparent hover:border-muted-foreground"
                                                 }`}
                                         >
                                             <Image

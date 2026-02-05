@@ -67,7 +67,7 @@ export default function CategoryProductsPage() {
                 const foundCategory = categoriesData?.find((cat: Category) => cat.slug === slug);
 
                 if (!foundCategory) {
-                    router.push("/collection/products");
+                    router.push("/collection");
                     return;
                 }
 
@@ -122,7 +122,7 @@ export default function CategoryProductsPage() {
             {/* Breadcrumb */}
             <div className="mb-6">
                 <Link
-                    href="/collection/products"
+                    href="/collection"
                     className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                     <ArrowLeft className="h-4 w-4 mr-2" />
@@ -153,7 +153,7 @@ export default function CategoryProductsPage() {
                     products.map((product) => (
                         <Link
                             key={product._id}
-                            href={`/collection/products/${product.slug}`}
+                            href={`/collection/${product.slug}`}
                         >
                             <Card className="group overflow-hidden flex flex-col h-full hover:shadow-xl transition-all duration-300 cursor-pointer">
                                 {/* Image */}

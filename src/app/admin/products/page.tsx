@@ -176,7 +176,7 @@ export default function AdminProductsPage() {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center justify-end gap-2">
-                      <Link href={`/collection/products/${product.slug}`} target="_blank">
+                      <Link href={`/collection/${product.slug}`} target="_blank">
                         <Button variant="ghost" size="icon" title="View Product">
                           <Eye className="h-4 w-4" />
                         </Button>
