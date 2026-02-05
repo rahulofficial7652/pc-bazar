@@ -4,41 +4,7 @@ import { Categories } from "@/components/home/Categories"
 import { FeaturedProducts } from "@/components/home/FeaturedProducts"
 import Link from "next/link"
 
-// Static data directly in the page
-const categories = [
-  {
-    id: "custom-pc",
-    title: "Custom PC",
-    description: "Build your PC exactly the way you want.",
-    cta: "Start Building",
-  },
-  {
-    id: "peripherals",
-    title: "Peripherals",
-    description: "Everything you need for your setup.",
-    cta: "Explore",
-  },
-  {
-    id: "monitors",
-    title: "Monitors",
-    description: "Top brands and stunning displays.",
-    cta: "View Monitors",
-  },
-  {
-    id: "prebuilt",
-    title: "Prebuilt PC",
-    description: "Ready-to-use powerful machines.",
-    cta: "Shop Now",
-  },
-]
-
-const featuredProducts = Array.from({ length: 8 }).map((_, i) => ({
-  id: `p-${i}`,
-  name: "Gaming PC",
-  subtitle: "High performance build",
-  price: 59999 + i * 2000,
-  inStock: true,
-}))
+import { featuredProducts, categories } from "@/lib/home";
 
 export default function HomePage() {
   return (

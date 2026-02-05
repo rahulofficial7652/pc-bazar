@@ -1,7 +1,7 @@
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
-import { AdminNavbar } from "@/components/admin/adminNavbar"
+import { AdminNavbar } from "@/components/admin/AdminNavbar"
 import { HomeIcon, CpuIcon } from "lucide-react"
-import { AdminPageSidebar } from "@/lib/sidebar/homePage"
+import { AdminSidebar } from "@/components/admin/AdminSidebar"
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const menuData = [
@@ -11,7 +11,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <SidebarProvider>
-     <AdminPageSidebar/>
+      <AdminSidebar />
       <SidebarInset>
         {/* Navbar yahan Inset ke andar rahega toh sidebar ke toggle par auto-adjust hoga */}
         <AdminNavbar menuItems={menuData} />

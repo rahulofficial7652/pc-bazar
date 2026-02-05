@@ -24,7 +24,7 @@ export type Product = {
 }
 
 // ================= MOCK DATA =================
-const heroData: HeroData = {
+export const heroData: HeroData = {
   badge: "New Us",
   title: "Same Store",
   highlight: "You Trust",
@@ -34,7 +34,7 @@ const heroData: HeroData = {
   secondaryCta: "Explore",
 }
 
-const categories: Category[] = [
+export const categories: Category[] = [
   {
     id: "custom-pc",
     title: "Custom PC",
@@ -61,7 +61,7 @@ const categories: Category[] = [
   },
 ]
 
-const featuredProducts: Product[] = Array.from({ length: 8 }).map(
+export const featuredProducts: Product[] = Array.from({ length: 8 }).map(
   (_, i) => ({
     id: `p-${i}`,
     name: "Gaming PC",

@@ -14,13 +14,23 @@ interface RouteParams {
   }>;
 }
 
-// GET a single product by ID
+// GET a single product by ID or slug
 export async function GET(req: NextRequest, { params }: RouteParams) {
   try {
     await connectDB();
     const { id } = await params;
 
-    const product = await Product.findById(id).populate("category");
+    let product;
+
+    // Check if it's a valid MongoDB ObjectId (24 hex characters)
+    if (/^[0-9a-fA-F]{24}$/.test(id)) {
+      // It's an ID
+      product = await Product.findById(id).populate("category");
+    } else {
+      // It's a slug
+      product = await Product.findOne({ slug: id, isActive: true }).populate("category");
+    }
+
     if (!product || !product.isActive) {
       throw new AppError({
         code: ERROR_CODES.RESOURCE_NOT_FOUND,

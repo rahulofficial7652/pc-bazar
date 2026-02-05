@@ -7,6 +7,7 @@ export interface Category {
 export interface Product {
     _id: string;
     name: string;
+    slug: string;
     price: number;
     discountPrice?: number;
     stock: number;
@@ -15,6 +16,46 @@ export interface Product {
     description?: string;
     brand?: string;
     images?: string[];
+
+    // E-commerce Details
+    highlights?: string[];
+    features?: Array<{
+        title: string;
+        description: string;
+    }>;
+
+    // Services & Policies
+    warranty?: {
+        duration?: string;
+        type?: string;
+        details?: string;
+    };
+    returnPolicy?: {
+        returnable?: boolean;
+        duration?: string;
+        details?: string;
+    };
+    shippingInfo?: {
+        freeShipping?: boolean;
+        minOrderForFreeShipping?: number;
+        estimatedDelivery?: string;
+        details?: string;
+    };
+
+    // Additional Info
+    manufacturerDetails?: {
+        name?: string;
+        country?: string;
+        address?: string;
+    };
+
+    // SEO
+    metaTitle?: string;
+    metaDescription?: string;
+    tags?: string[];
+
+    // Status
     isActive: boolean;
+    isFeatured?: boolean;
     createdAt: string;
 }
