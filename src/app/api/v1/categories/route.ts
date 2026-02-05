@@ -1,62 +1,70 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { Category } from "@/models/category";
 import { connectDB } from "@/lib/db";
 import { ApiResponse } from "@/lib/utils/apiResponse";
-import { AppError } from "@/lib/errors/AppError";
-import { ERROR_CODES } from "@/lib/errors/errorCodes";
-import { handleRouteError } from "@/lib/errors/handleRouteError";
+import {
+  handleRouteError,
+  ForbiddenError,
+  ValidationError,
+  DuplicateResourceError,
+  DatabaseError,
+} from "@/lib/errors";
 
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
-    
-    // Auth Check
+
+    // Auth check - Admin only
     const session = await getServerSession(authOptions);
     // @ts-ignore
     if (!session || session.user?.role !== "ADMIN") {
-        throw new AppError({
-            code: ERROR_CODES.UNAUTHORIZED,
-            message: "Unauthorized access",
-            statusCode: 401
-        });
+      throw new ForbiddenError("Admin access required to create categories");
     }
 
+    // Parse and validate input
     const body = await req.json();
     const { name, slug } = body;
 
     if (!name || !slug) {
-        throw new AppError({
-            code: ERROR_CODES.INVALID_INPUT,
-            message: "Name and slug are required",
-            statusCode: 400
-        });
+      throw new ValidationError("Name and slug are required", {
+        required: ["name", "slug"],
+      });
     }
 
-    const existingCategory = await Category.findOne({ slug });
-    if (existingCategory) {
-        throw new AppError({
-            code: ERROR_CODES.DUPLICATE_RESOURCE,
-            message: "Category with this slug already exists",
-            statusCode: 409
-        });
-    }
+    // Check for duplicates and create
+    try {
+      const existingCategory = await Category.findOne({ slug });
+      if (existingCategory) {
+        throw new DuplicateResourceError("Category with this slug");
+      }
 
-    const category = await Category.create({ name, slug, isActive: true });
-    return ApiResponse.success(category, "Category created successfully", 201);
+      const category = await Category.create({ name, slug, isActive: true });
+      return ApiResponse.success(category, "Category created successfully", 201);
+    } catch (dbError) {
+      if (dbError instanceof DuplicateResourceError) {
+        throw dbError;
+      }
+      throw new DatabaseError("Failed to create category", { originalError: dbError });
+    }
   } catch (error) {
-    return handleRouteError(error, "CreateCategory");
+    return handleRouteError(error, "POST /api/v1/categories");
   }
 }
 
 export async function GET() {
   try {
     await connectDB();
-    // Only return active categories for public list
-    const categories = await Category.find({ isActive: true }).sort({ createdAt: -1 });
-    return ApiResponse.success(categories);
+
+    // Fetch active categories
+    try {
+      const categories = await Category.find({ isActive: true }).sort({ createdAt: -1 });
+      return ApiResponse.success(categories);
+    } catch (dbError) {
+      throw new DatabaseError("Failed to fetch categories", { originalError: dbError });
+    }
   } catch (error) {
-    return handleRouteError(error, "GetCategories");
+    return handleRouteError(error, "GET /api/v1/categories");
   }
 }

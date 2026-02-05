@@ -114,10 +114,10 @@ export function Navbar() {
                       {session.user?.name || session.user?.email}
                     </div>
                     <MenubarSeparator />
-                    <Link href="/dashboard">
+                    <Link href="/account">
                       <MenubarItem>
                         <LayoutDashboardIcon className="mr-2 h-4 w-4" />
-                        Dashboard
+                        My Account
                       </MenubarItem>
                     </Link>
                     {/* @ts-ignore */}

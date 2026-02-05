@@ -1,12 +1,15 @@
 import { NextRequest } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth"; // Already correct
+import { authOptions } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { Product } from "@/models/product";
 import { ApiResponse } from "@/lib/utils/apiResponse";
-import { handleRouteError } from "@/lib/errors/handleRouteError";
-import { AppError } from "@/lib/errors/AppError";
-import { ERROR_CODES } from "@/lib/errors/errorCodes";
+import {
+  handleRouteError,
+  ForbiddenError,
+  ResourceNotFoundError,
+  DatabaseError,
+} from "@/lib/errors";
 
 interface RouteParams {
   params: Promise<{
@@ -20,28 +23,31 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     await connectDB();
     const { id } = await params;
 
-    let product;
+    try {
+      let product;
 
-    // Check if it's a valid MongoDB ObjectId (24 hex characters)
-    if (/^[0-9a-fA-F]{24}$/.test(id)) {
-      // It's an ID
-      product = await Product.findById(id).populate("category");
-    } else {
-      // It's a slug
-      product = await Product.findOne({ slug: id, isActive: true }).populate("category");
+      // Check if it's a valid MongoDB ObjectId (24 hex characters)
+      if (/^[0-9a-fA-F]{24}$/.test(id)) {
+        // It's an ID
+        product = await Product.findById(id).populate("category");
+      } else {
+        // It's a slug
+        product = await Product.findOne({ slug: id, isActive: true }).populate("category");
+      }
+
+      if (!product || !product.isActive) {
+        throw new ResourceNotFoundError("Product");
+      }
+
+      return ApiResponse.success(product);
+    } catch (dbError) {
+      if (dbError instanceof ResourceNotFoundError) {
+        throw dbError;
+      }
+      throw new DatabaseError("Failed to fetch product", { originalError: dbError });
     }
-
-    if (!product || !product.isActive) {
-      throw new AppError({
-        code: ERROR_CODES.RESOURCE_NOT_FOUND,
-        message: "Product not found.",
-        statusCode: 404,
-      });
-    }
-
-    return ApiResponse.success(product);
   } catch (error) {
-    return handleRouteError(error, "Failed to fetch product");
+    return handleRouteError(error, `GET /api/v1/products/${(await params).id}`);
   }
 }
 
@@ -51,34 +57,36 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
     await connectDB();
     const { id } = await params;
 
+    // Auth check - Admin only
     const session = await getServerSession(authOptions);
     // @ts-ignore
     if (!session || session.user?.role !== "ADMIN") {
-      throw new AppError({
-        code: ERROR_CODES.UNAUTHORIZED,
-        message: "Unauthorized",
-        statusCode: 401,
-      });
+      throw new ForbiddenError("Admin access required to update products");
     }
 
+    // Parse input
     const body = await req.json();
 
-    const updatedProduct = await Product.findByIdAndUpdate(id, body, {
-      new: true,
-      runValidators: true,
-    });
-
-    if (!updatedProduct) {
-      throw new AppError({
-        code: ERROR_CODES.RESOURCE_NOT_FOUND,
-        message: "Product not found for updating.",
-        statusCode: 404,
+    // Update product with error handling
+    try {
+      const updatedProduct = await Product.findByIdAndUpdate(id, body, {
+        new: true,
+        runValidators: true,
       });
-    }
 
-    return ApiResponse.success(updatedProduct, "Product updated successfully");
+      if (!updatedProduct) {
+        throw new ResourceNotFoundError("Product");
+      }
+
+      return ApiResponse.success(updatedProduct, "Product updated successfully");
+    } catch (dbError) {
+      if (dbError instanceof ResourceNotFoundError) {
+        throw dbError;
+      }
+      throw new DatabaseError("Failed to update product", { originalError: dbError });
+    }
   } catch (error) {
-    return handleRouteError(error, "Failed to update product");
+    return handleRouteError(error, `PUT /api/v1/products/${(await params).id}`);
   }
 }
 
@@ -88,35 +96,36 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
     await connectDB();
     const { id } = await params;
 
+    // Auth check - Admin only
     const session = await getServerSession(authOptions);
     // @ts-ignore
     if (!session || session.user?.role !== "ADMIN") {
-      throw new AppError({
-        code: ERROR_CODES.UNAUTHORIZED,
-        message: "Unauthorized",
-        statusCode: 401,
-      });
+      throw new ForbiddenError("Admin access required to delete products");
     }
 
-    const deletedProduct = await Product.findByIdAndUpdate(
-      id,
-      { isActive: false },
-      { new: true },
-    );
+    // Soft delete with error handling
+    try {
+      const deletedProduct = await Product.findByIdAndUpdate(
+        id,
+        { isActive: false },
+        { new: true }
+      );
 
-    if (!deletedProduct) {
-      throw new AppError({
-        code: ERROR_CODES.RESOURCE_NOT_FOUND,
-        message: "Product not found for deletion.",
-        statusCode: 404,
-      });
+      if (!deletedProduct) {
+        throw new ResourceNotFoundError("Product");
+      }
+
+      return ApiResponse.success(
+        { deletedProductId: id },
+        "Product deleted successfully"
+      );
+    } catch (dbError) {
+      if (dbError instanceof ResourceNotFoundError) {
+        throw dbError;
+      }
+      throw new DatabaseError("Failed to delete product", { originalError: dbError });
     }
-
-    return ApiResponse.success(
-      { deletedProductId: id },
-      "Product deleted successfully",
-    );
   } catch (error) {
-    return handleRouteError(error, "Failed to delete product");
+    return handleRouteError(error, `DELETE /api/v1/products/${(await params).id}`);
   }
 }

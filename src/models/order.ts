@@ -10,10 +10,10 @@ const orderSchema = new Schema({
         image: { type: String }
     }],
     totalAmount: { type: Number, required: true },
-    status: { 
-        type: String, 
-        enum: ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"], 
-        default: "PENDING" 
+    status: {
+        type: String,
+        enum: ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"],
+        default: "PENDING"
     },
     shippingAddress: {
         fullname: { type: String, required: true },
@@ -21,6 +21,7 @@ const orderSchema = new Schema({
         city: { type: String, required: true },
         postalCode: { type: String, required: true },
         country: { type: String, required: true },
+        phone: { type: String, required: true },
     },
     paymentMethod: { type: String, default: "COD" }, // Simplified
     isPaid: { type: Boolean, default: false },
