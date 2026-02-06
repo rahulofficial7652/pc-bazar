@@ -6,12 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import {
   Package,
   ShoppingCart,
-  TrendingUp,
   Users,
   DollarSign,
   AlertTriangle,
-  CheckCircle,
-  XCircle,
   ShoppingBag,
   Truck,
 } from "lucide-react";
@@ -55,6 +52,23 @@ export default function AdminDashboard() {
             <Skeleton key={i} className="h-32" />
           ))}
         </div>
+      </div>
+    );
+  }
+
+  if (!stats) {
+    return (
+      <div className="flex flex-col items-center justify-center p-12 space-y-4">
+        <div className="bg-red-50 p-4 rounded-full">
+          <AlertTriangle className="h-10 w-10 text-red-600" />
+        </div>
+        <div className="text-center">
+          <h2 className="text-2xl font-bold">Failed to load statistics</h2>
+          <p className="text-muted-foreground">Please check your database connection or try again later.</p>
+        </div>
+        <Button onClick={() => window.location.reload()}>
+          Retry
+        </Button>
       </div>
     );
   }

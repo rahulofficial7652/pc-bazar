@@ -9,6 +9,7 @@ import {
     ValidationError,
     DatabaseError,
 } from "@/lib/errors";
+import { ApiResponse } from "@/lib/utils/apiResponse";
 
 export async function GET(req: Request) {
     try {
@@ -59,7 +60,7 @@ export async function GET(req: Request) {
                 lastLogin: u.updatedAt,
             }));
 
-            return Response.json(formattedUsers, { status: 200 });
+            return ApiResponse.success(formattedUsers);
         } catch (dbError) {
             throw new DatabaseError("Failed to fetch users", { originalError: dbError });
         }
@@ -108,10 +109,7 @@ export async function PATCH(req: Request) {
                 throw new ResourceNotFoundError("User");
             }
 
-            return Response.json(
-                { message: "User updated successfully", user: updatedUser },
-                { status: 200 }
-            );
+            return ApiResponse.success(updatedUser, "User updated successfully");
         } catch (dbError) {
             if (dbError instanceof ResourceNotFoundError) {
                 throw dbError;

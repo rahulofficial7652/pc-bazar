@@ -9,6 +9,7 @@ import {
     ResourceNotFoundError,
     ValidationError,
     DatabaseError,
+    ForbiddenError,
 } from "@/lib/errors";
 
 export async function GET(req: Request) {
@@ -19,11 +20,18 @@ export async function GET(req: Request) {
             throw new UnauthorizedError("Please login to view addresses");
         }
 
+        const userId = (session.user as any).id;
+
         // DB connection
         await connectDB();
 
+        // If it's a static admin, they don't have addresses in DB
+        if (userId === "admin") {
+            return Response.json({ addresses: [] }, { status: 200 });
+        }
+
         // Fetch user
-        const user = await User.findOne({ email: session.user.email }).select("addresses");
+        const user = await User.findById(userId).select("addresses");
         if (!user) {
             throw new ResourceNotFoundError("User");
         }
@@ -52,11 +60,18 @@ export async function POST(req: Request) {
             });
         }
 
+        const userId = (session.user as any).id;
+
         // DB connection
         await connectDB();
 
+        // Static admin cannot manage DB resources
+        if (userId === "admin") {
+            throw new ForbiddenError("Static admin cannot manage these resources.");
+        }
+
         // Fetch user
-        const user = await User.findOne({ email: session.user.email });
+        const user = await User.findById(userId);
         if (!user) {
             throw new ResourceNotFoundError("User");
         }
@@ -121,11 +136,18 @@ export async function PUT(req: Request) {
             throw new ValidationError("Address ID is required");
         }
 
+        const userId = (session.user as any).id;
+
         // DB connection
         await connectDB();
 
+        // Static admin cannot manage DB resources
+        if (userId === "admin") {
+            throw new ForbiddenError("Static admin cannot manage these resources.");
+        }
+
         // Fetch user
-        const user = await User.findOne({ email: session.user.email });
+        const user = await User.findById(userId);
         if (!user) {
             throw new ResourceNotFoundError("User");
         }
@@ -187,11 +209,18 @@ export async function DELETE(req: Request) {
             throw new ValidationError("Address ID is required");
         }
 
+        const userId = (session.user as any).id;
+
         // DB connection
         await connectDB();
 
+        // Static admin cannot manage DB resources
+        if (userId === "admin") {
+            throw new ForbiddenError("Static admin cannot manage these resources.");
+        }
+
         // Fetch user
-        const user = await User.findOne({ email: session.user.email });
+        const user = await User.findById(userId);
         if (!user) {
             throw new ResourceNotFoundError("User");
         }

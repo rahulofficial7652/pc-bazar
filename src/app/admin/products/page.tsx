@@ -23,8 +23,6 @@ import {
   Eye,
   Search,
   Filter,
-  Download,
-  Upload,
   TrendingUp,
   TrendingDown,
   Package,
@@ -424,7 +422,7 @@ export default function AdminProductsPage() {
 
       {/* Products Table */}
       <Card>
-        <div className="rounded-lg border">
+        <div className="rounded-lg border mx-3">
           <Table>
             <TableHeader>
               <TableRow>

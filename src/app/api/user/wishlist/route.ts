@@ -10,6 +10,7 @@ import {
     ValidationError,
     DatabaseError,
     DuplicateResourceError,
+    ForbiddenError,
 } from "@/lib/errors";
 
 export async function GET(req: Request) {
@@ -20,12 +21,19 @@ export async function GET(req: Request) {
             throw new UnauthorizedError("Please login to view wishlist");
         }
 
+        const userId = (session.user as any).id;
+
         // DB connection
         await connectDB();
 
+        // If it's a static admin, they don't have wishlist in DB
+        if (userId === "admin") {
+            return Response.json({ wishlist: [] }, { status: 200 });
+        }
+
         // Fetch user with populated wishlist
         try {
-            const user = await User.findOne({ email: session.user.email }).populate({
+            const user = await User.findById(userId).populate({
                 path: "wishlist",
                 model: Product,
             });
@@ -59,11 +67,18 @@ export async function POST(req: Request) {
             throw new ValidationError("Product ID is required");
         }
 
+        const userId = (session.user as any).id;
+
         // DB connection
         await connectDB();
 
+        // Static admin cannot manage wishlist
+        if (userId === "admin") {
+            throw new ForbiddenError("Static admin cannot manage wishlist.");
+        }
+
         // Fetch user
-        const user = await User.findOne({ email: session.user.email });
+        const user = await User.findById(userId);
         if (!user) {
             throw new ResourceNotFoundError("User");
         }
@@ -114,11 +129,18 @@ export async function DELETE(req: Request) {
             throw new ValidationError("Product ID is required");
         }
 
+        const userId = (session.user as any).id;
+
         // DB connection
         await connectDB();
 
+        // Static admin cannot manage wishlist
+        if (userId === "admin") {
+            throw new ForbiddenError("Static admin cannot manage wishlist.");
+        }
+
         // Fetch user
-        const user = await User.findOne({ email: session.user.email });
+        const user = await User.findById(userId);
         if (!user) {
             throw new ResourceNotFoundError("User");
         }

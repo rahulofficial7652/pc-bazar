@@ -24,8 +24,10 @@ import { toast } from "sonner"; // Assuming sonner is installed as per package.j
 
 export default function LoginForm({
   className,
+  searchParams,
+  params,
   ...props
-}: React.ComponentProps<"div">) {
+}: React.ComponentProps<"div"> & { searchParams?: any; params?: any }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 

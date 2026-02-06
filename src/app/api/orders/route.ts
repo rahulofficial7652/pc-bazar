@@ -20,14 +20,12 @@ export async function GET(req: Request) {
             throw new UnauthorizedError("Please login to view orders");
         }
 
+        const userEmail = session.user.email;
+        const userId = (session.user as any).id;
+        const userRole = (session.user as any).role;
+
         // DB connection
         await connectDB();
-
-        // Fetch user
-        const user = await User.findOne({ email: session.user.email });
-        if (!user) {
-            throw new ResourceNotFoundError("User");
-        }
 
         // Parse query params
         const { searchParams } = new URL(req.url);
@@ -36,15 +34,19 @@ export async function GET(req: Request) {
 
         let query: any = {};
 
-        // If not admin or not requesting admin view, restrict to own orders
+        // If admin view is requested, verify permissions
         if (isAdminView) {
-            if (user.role !== "ADMIN") {
+            if (userRole !== "ADMIN") {
                 throw new ForbiddenError("Admin access required to view all orders");
             }
             // Admin can see all orders, no filter
         } else {
             // User can only see their own orders
-            query = { user: user._id };
+            // If they are a static admin, they don't have orders in DB by default
+            if (userId === "admin") {
+                return Response.json({ orders: [] }, { status: 200 });
+            }
+            query = { user: userId };
         }
 
         // Fetch orders
@@ -71,13 +73,14 @@ export async function POST(req: Request) {
             throw new UnauthorizedError("Please login to create order");
         }
 
+        const userId = (session.user as any).id;
+
         // DB connection
         await connectDB();
 
-        // Fetch user
-        const user = await User.findOne({ email: session.user.email });
-        if (!user) {
-            throw new ResourceNotFoundError("User");
+        // If it's a static admin not in DB, they can't create orders
+        if (userId === "admin") {
+            throw new ForbiddenError("Static admin cannot create orders. Please use a registered account.");
         }
 
         // Parse and validate input
@@ -101,7 +104,7 @@ export async function POST(req: Request) {
         // Create order
         try {
             const newOrder = await Order.create({
-                user: user._id,
+                user: userId,
                 items,
                 totalAmount,
                 shippingAddress,

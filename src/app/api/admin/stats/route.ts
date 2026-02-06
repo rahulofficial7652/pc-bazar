@@ -5,6 +5,7 @@ import { Product } from "@/models/product";
 import User from "@/models/user";
 import { Order } from "@/models/order";
 import { Category } from "@/models/category";
+import { ApiResponse } from "@/lib/utils/apiResponse";
 import {
     handleRouteError,
     ForbiddenError,
@@ -83,36 +84,33 @@ export async function GET(req: Request) {
             // 4. Categories
             const totalCategories = await Category.countDocuments();
 
-            return Response.json(
-                {
-                    products: {
-                        total: totalProducts,
-                        active: activeProducts,
-                        inactive: totalProducts - activeProducts,
-                        outOfStock: invData.outOfStock,
-                        lowStock: invData.lowStock,
-                    },
-                    categories: {
-                        total: totalCategories,
-                    },
-                    inventory: {
-                        totalValue: invData.totalValue,
-                    },
-                    users: {
-                        total: totalUsers,
-                        active: activeUsers,
-                    },
-                    orders: {
-                        total: totalOrders,
-                        pending: pendingOrders,
-                        shipped: shippedOrders,
-                        delivered: deliveredOrders,
-                        revenue: revenueStats[0]?.totalRevenue || 0,
-                        pendingRevenue: pendingRevenueStats[0]?.totalRevenue || 0,
-                    },
+            return ApiResponse.success({
+                products: {
+                    total: totalProducts,
+                    active: activeProducts,
+                    inactive: totalProducts - activeProducts,
+                    outOfStock: invData.outOfStock,
+                    lowStock: invData.lowStock,
                 },
-                { status: 200 }
-            );
+                categories: {
+                    total: totalCategories,
+                },
+                inventory: {
+                    totalValue: invData.totalValue,
+                },
+                users: {
+                    total: totalUsers,
+                    active: activeUsers,
+                },
+                orders: {
+                    total: totalOrders,
+                    pending: pendingOrders,
+                    shipped: shippedOrders,
+                    delivered: deliveredOrders,
+                    revenue: revenueStats[0]?.totalRevenue || 0,
+                    pendingRevenue: pendingRevenueStats[0]?.totalRevenue || 0,
+                },
+            });
         } catch (dbError) {
             throw new DatabaseError("Failed to fetch admin statistics", {
                 originalError: dbError,

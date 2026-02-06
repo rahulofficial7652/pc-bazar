@@ -24,8 +24,10 @@ import { signIn } from "next-auth/react";
 
 export default function SignupForm({
   className,
+  searchParams,
+  params,
   ...props
-}: React.ComponentProps<"div">) {
+}: React.ComponentProps<"div"> & { searchParams?: any; params?: any }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
