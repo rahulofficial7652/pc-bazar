@@ -2,6 +2,7 @@ import { Product } from "@/lib/home"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import Link from "next/link"
 
 export function FeaturedProducts({
   data,
@@ -39,9 +40,11 @@ export function FeaturedProducts({
                   )}
                 </div>
 
-                <Button size="sm" className="w-full">
-                  Shop Now
-                </Button>
+                <Link href={`/product/${p.id}`} className="w-full">
+                  <Button size="sm" className="w-full">
+                    Shop Now
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           ))}

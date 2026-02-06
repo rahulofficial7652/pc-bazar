@@ -1,11 +1,37 @@
-'use client'
 import { Button } from "@/components/ui/button"
 import { FeaturedProducts } from "@/components/home/FeaturedProducts"
 import Link from "next/link"
+import { connectDB } from "@/lib/db";
+import { Product as ProductModel } from "@/models/product";
+import { Product } from "@/lib/home";
 
-import { featuredProducts } from "@/lib/home";
+export const dynamic = 'force-dynamic';
 
-export default function HomePage() {
+async function getFeaturedProducts(): Promise<Product[]> {
+  try {
+    await connectDB();
+    const products = await ProductModel.find({ isFeatured: true, isActive: true })
+      .limit(8)
+      .sort({ createdAt: -1 })
+      .lean();
+    
+    // Map DB objects to the interface expected by FeaturedProducts
+    return products.map((p: any) => ({
+      id: p._id.toString(),
+      name: p.name,
+      subtitle: p.brand || (p.description ? p.description.substring(0, 40) + "..." : "High Performance"),
+      price: p.price,
+      inStock: p.stock > 0
+    }));
+  } catch (error) {
+    console.error("Failed to fetch featured products:", error);
+    return [];
+  }
+}
+
+export default async function HomePage() {
+  const products = await getFeaturedProducts();
+
   return (
     <main>
       {/* Hero Section - Simplified and Static */}
@@ -32,9 +58,11 @@ export default function HomePage() {
             </p>
 
             <div className="mt-8 flex gap-4">
-              <Button size="lg">
-                Shop Now
-              </Button>
+              <Link href="/products">
+                <Button size="lg">
+                  Shop Now
+                </Button>
+              </Link>
               <Link href="/categories">
                 <Button size="lg" variant="outline">
                   Explore
@@ -51,8 +79,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* <Categories data={categories} /> */}
-      <FeaturedProducts data={featuredProducts} />
+      <FeaturedProducts data={products} />
     </main>
   )
 }

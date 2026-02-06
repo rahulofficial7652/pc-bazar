@@ -81,9 +81,14 @@ export async function GET(req: NextRequest) {
         const sortBy = searchParams.get("sortBy") || "createdAt";
         const order = searchParams.get("order") || "desc";
         const search = searchParams.get("search");
+        const isFeatured = searchParams.get("isFeatured");
 
         // Build query
         const query: any = { isActive: true };
+
+        if (isFeatured === "true") {
+            query.isFeatured = true;
+        }
 
         if (category) {
             query.category = category;

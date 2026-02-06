@@ -2,6 +2,9 @@
 
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { useState, useEffect } from "react";
+import { apiClient } from "@/lib/frontend/api-client";
+import { Badge } from "@/components/ui/badge";
 import {
     Card,
     CardContent,
@@ -22,6 +25,56 @@ import {
 
 export default function AccountDashboard() {
     const { data: session } = useSession();
+    const [stats, setStats] = useState({
+        orders: 0,
+        wishlist: 0,
+        addresses: 0
+    });
+    const [recentOrder, setRecentOrder] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            if (!session?.user) return;
+            
+            setLoading(true);
+            try {
+                // Fetch orders
+                const ordersRes = await apiClient<any>("/api/orders?limit=1");
+                const ordersData = ordersRes?.orders || [];
+                
+                // Fetch wishlist
+                const wishlistRes = await apiClient<any>("/api/user/wishlist");
+                const wishlistData = wishlistRes?.wishlist || [];
+
+                // Fetch addresses
+                const addressesRes = await apiClient<any>("/api/user/addresses");
+                const addressesData = addressesRes?.addresses || [];
+
+                setStats({
+                    orders: ordersRes?.totalOrders || ordersData.length,
+                    wishlist: wishlistData.length,
+                    addresses: addressesData.length
+                });
+
+                 // Re-fetch orders fully to get count correctly
+                 const allOrdersRes = await apiClient<any>("/api/orders");
+                 if (allOrdersRes?.orders) {
+                     setStats(prev => ({ ...prev, orders: allOrdersRes.orders.length }));
+                     if (allOrdersRes.orders.length > 0) {
+                         setRecentOrder(allOrdersRes.orders[0]);
+                     }
+                 }
+
+            } catch (error) {
+                console.error("Failed to fetch user stats", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchUserData();
+    }, [session]);
 
     const quickLinks = [
         {
@@ -104,18 +157,39 @@ export default function AccountDashboard() {
                     <CardDescription>Your recent orders and updates</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="flex flex-col items-center justify-center py-8 text-center">
-                        <Package className="h-12 w-12 text-muted-foreground mb-3" />
-                        <p className="text-muted-foreground mb-4">
-                            No recent orders
-                        </p>
-                        <Link href="/collection">
-                            <Button>
-                                <ShoppingBag className="h-4 w-4 mr-2" />
-                                Start Shopping
-                            </Button>
-                        </Link>
-                    </div>
+                    {loading ? (
+                         <div className="text-center py-8">Loading...</div>
+                    ) : recentOrder ? (
+                        <div className="flex items-center justify-between p-4 border rounded-lg">
+                            <div className="flex items-center gap-4">
+                                <div className="p-2 bg-green-100 dark:bg-green-900 rounded-full">
+                                    <Package className="h-6 w-6 text-green-600 dark:text-green-400" />
+                                </div>
+                                <div>
+                                    <p className="font-medium">Order #{recentOrder._id.substring(0, 8)}</p>
+                                    <p className="text-sm text-muted-foreground">
+                                        {new Date(recentOrder.createdAt).toLocaleDateString()} • ₹{recentOrder.totalAmount}
+                                    </p>
+                                </div>
+                            </div>
+                            <Badge variant={recentOrder.status === 'DELIVERED' ? 'default' : 'secondary'}>
+                                {recentOrder.status}
+                            </Badge>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center py-8 text-center">
+                            <Package className="h-12 w-12 text-muted-foreground mb-3" />
+                            <p className="text-muted-foreground mb-4">
+                                No recent orders
+                            </p>
+                            <Link href="/collection">
+                                <Button>
+                                    <ShoppingBag className="h-4 w-4 mr-2" />
+                                    Start Shopping
+                                </Button>
+                            </Link>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
 
@@ -127,7 +201,7 @@ export default function AccountDashboard() {
                         <ShoppingBag className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">0</div>
+                        <div className="text-2xl font-bold">{stats.orders}</div>
                         <p className="text-xs text-muted-foreground">All time</p>
                     </CardContent>
                 </Card>
@@ -138,7 +212,7 @@ export default function AccountDashboard() {
                         <Heart className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">0</div>
+                        <div className="text-2xl font-bold">{stats.wishlist}</div>
                         <p className="text-xs text-muted-foreground">Saved products</p>
                     </CardContent>
                 </Card>
@@ -149,7 +223,7 @@ export default function AccountDashboard() {
                         <MapPin className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">0</div>
+                        <div className="text-2xl font-bold">{stats.addresses}</div>
                         <p className="text-xs text-muted-foreground">Saved addresses</p>
                     </CardContent>
                 </Card>
