@@ -49,7 +49,7 @@ export default function SignupForm({
       const data = await response.json();
 
       if (!response.ok) {
-         // Logging for developer context if needed
+        // Logging for developer context if needed
         console.error("[routerError] Signup failed:", data.error?.code || "UNKNOWN");
         toast.error(data.error?.message || data.message || "Registration failed");
       } else {
@@ -109,11 +109,11 @@ export default function SignupForm({
                   </div>
 
                   <Field>
-                    <Button 
-                      variant="outline" 
-                      type="button" 
-                      className="w-full" 
-                      onClick={() => signIn("google", { callbackUrl: "/admin" })}
+                    <Button
+                      variant="outline"
+                      type="button"
+                      className="w-full"
+                      onClick={() => signIn("google", { callbackUrl: "/account" })}
                     >
                       Signup with Google
                     </Button>

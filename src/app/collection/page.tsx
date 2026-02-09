@@ -10,14 +10,18 @@ import { apiClient } from "@/lib/frontend/api-client";
 import { Category, Product } from "@/types";
 import { toSentenceCase } from "@/lib/utils/sentenceCase";
 
+import { useCart } from "@/hooks/useCart";
+
 /* ---------------------------
    PRODUCT ROW UI (Category-wise)
 ---------------------------- */
 
 function ProductRow({ category, products }: { category: Category; products: Product[] }) {
+  const { addToCart } = useCart();
+
   return (
     <section className="mb-16 last:mb-0">
-      {/* Category Header */}
+      {/* Category Header ... (unchanged) */}
       <div className="flex items-end justify-between mb-6 border-b pb-2">
         <div>
           <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight">
@@ -50,10 +54,10 @@ function ProductRow({ category, products }: { category: Category; products: Prod
           products.slice(0, 4).map((product) => (
             <Link
               key={product._id}
-              href={`/collection/${product.slug}`}
+              href={`/collection/${product.slug || product._id}`}
               className="min-w-[260px] sm:min-w-0 group border rounded-2xl overflow-hidden bg-card hover:shadow-2xl hover:border-primary/20 transition-all duration-300 ease-in-out flex flex-col"
             >
-              {/* Optimized Image View */}
+              {/* Optimized Image View ... (unchanged) */}
               <div className="relative aspect-square w-full bg-slate-50 overflow-hidden">
                 {product.images?.[0] ? (
                   <Image
@@ -118,15 +122,16 @@ function ProductRow({ category, products }: { category: Category; products: Prod
                     className="rounded-full hover:bg-primary hover:text-white"
                     onClick={(e) => {
                       e.preventDefault();
-                      // Add to cart logic
+                      addToCart(product._id);
                     }}
+                    disabled={product.stock <= 0}
                   >
                     <ShoppingCart size={18} />
                   </Button>
                 </div>
 
                 <Button className="w-full font-bold shadow-sm" variant="default">
-                  Select Component
+                  View Components
                 </Button>
               </div>
             </Link>

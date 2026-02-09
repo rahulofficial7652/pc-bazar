@@ -9,6 +9,7 @@ import {
   ForbiddenError,
   ResourceNotFoundError,
   DatabaseError,
+  ValidationError,
 } from "@/lib/errors";
 
 interface RouteParams {
@@ -66,6 +67,37 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
 
     // Parse input
     const body = await req.json();
+
+    // Sanitize and Validate Price Logic if present in body
+    if (body.price !== undefined || body.discountPrice !== undefined) {
+      // Fetch current product to safely handle partial updates if needed, 
+      // but for simplicity and robustness, we expect the frontend to send the full object or we re-validate what's sent.
+      // Assuming the frontend sends the values it wants to update.
+
+      let finalPrice = body.price !== undefined ? Number(body.price) : undefined;
+      let finalDiscountPrice = body.discountPrice !== undefined ? (body.discountPrice ? Number(body.discountPrice) : null) : undefined;
+
+      // Ensure we have valid numbers if they are being updated
+      if (finalPrice !== undefined && isNaN(finalPrice)) throw new ValidationError("Price must be a valid number");
+      if (finalDiscountPrice !== undefined && finalDiscountPrice !== null && isNaN(finalDiscountPrice)) throw new ValidationError("Discount Price must be a valid number");
+
+      // Logic: If both are provided, check relationship
+      if (finalPrice !== undefined && finalDiscountPrice !== undefined && finalDiscountPrice !== null) {
+        if (finalDiscountPrice > finalPrice) {
+          // Swap if Discount Price > Price (Assuming user error or specific requirement to always show higher as MRP)
+          const temp = finalPrice;
+          finalPrice = finalDiscountPrice;
+          finalDiscountPrice = temp;
+        } else if (finalDiscountPrice === finalPrice) {
+          finalDiscountPrice = null;
+        }
+      }
+      // NOTE: If only one is provided, we might risk inconsistency without fetching the existing product first. 
+      // However, for a robust update, we'll apply value updates to the body.
+
+      if (finalPrice !== undefined) body.price = finalPrice;
+      if (finalDiscountPrice !== undefined) body.discountPrice = finalDiscountPrice;
+    }
 
     // Update product with error handling
     try {

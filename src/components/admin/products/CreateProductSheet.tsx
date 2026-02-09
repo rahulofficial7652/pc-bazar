@@ -137,7 +137,7 @@ export function CreateProductSheet({ onSuccess }: CreateProductSheetProps) {
       stock: Number(stock),
       category: categoryId,
       images,
-      isFeatured,
+      isFeatured: Boolean(isFeatured),
 
       // Specs
       specs: specs.reduce((acc, curr) => {

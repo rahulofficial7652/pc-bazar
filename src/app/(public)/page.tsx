@@ -7,22 +7,15 @@ import { Product } from "@/lib/home";
 
 export const dynamic = 'force-dynamic';
 
-async function getFeaturedProducts(): Promise<Product[]> {
+async function getFeaturedProducts(): Promise<import("@/types").Product[]> {
   try {
     await connectDB();
-    const products = await ProductModel.find({ isFeatured: true, isActive: true })
-      .limit(8)
+    const products = await ProductModel.find({ isActive: true })
       .sort({ createdAt: -1 })
+      .limit(8)
       .lean();
-    
-    // Map DB objects to the interface expected by FeaturedProducts
-    return products.map((p: any) => ({
-      id: p._id.toString(),
-      name: p.name,
-      subtitle: p.brand || (p.description ? p.description.substring(0, 40) + "..." : "High Performance"),
-      price: p.price,
-      inStock: p.stock > 0
-    }));
+
+    return JSON.parse(JSON.stringify(products));
   } catch (error) {
     console.error("Failed to fetch featured products:", error);
     return [];
@@ -58,12 +51,12 @@ export default async function HomePage() {
             </p>
 
             <div className="mt-8 flex gap-4">
-              <Link href="/products">
+              <Link href="/collection">
                 <Button size="lg">
                   Shop Now
                 </Button>
               </Link>
-              <Link href="/categories">
+              <Link href="#">
                 <Button size="lg" variant="outline">
                   Explore
                 </Button>

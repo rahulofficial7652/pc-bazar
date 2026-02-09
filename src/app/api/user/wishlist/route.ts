@@ -39,7 +39,8 @@ export async function GET(req: Request) {
             });
 
             if (!user) {
-                throw new ResourceNotFoundError("User");
+                // Return empty wishlist instead of error to avoid toast on every page load
+                return Response.json({ success: true, data: [] }, { status: 200 });
             }
 
             return Response.json({ wishlist: user.wishlist || [] }, { status: 200 });

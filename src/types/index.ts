@@ -61,3 +61,21 @@ export interface Product {
     isFeatured?: boolean;
     createdAt: string;
 }
+
+export interface User {
+    _id: string;
+    name: string;
+    email: string;
+    role: "USER" | "ADMIN";
+    image?: string;
+    phone?: string;
+    wishlist: Product[] | string[];
+    cart: Array<{
+        product: Product | string;
+        quantity: number;
+        _id: string;
+    }>;
+    isActive: boolean;
+    createdAt: string;
+}
+

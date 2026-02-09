@@ -21,17 +21,23 @@ import {
   MenuIcon,
   PackageIcon,
   ChevronRightIcon,
+  HeartIcon,
 } from "lucide-react";
 import { ModeToggle } from "@/components/theme/ModeToggle";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 
 import { useCategories } from "@/hooks/useCategories";
+import { useCart } from "@/hooks/useCart";
+import { useWishlist } from "@/hooks/useWishlist";
+import { Badge } from "@/components/ui/badge";
 
 export function Navbar() {
   const { data: session, status } = useSession();
   const isLoading = status === "loading";
   const { categories, loading: categoriesLoading } = useCategories();
+  const { totalItems } = useCart();
+  const { wishlist } = useWishlist();
 
   return (
     <header className="w-full border-b fixed top-0 z-50 shadow-sm bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -85,15 +91,39 @@ export function Navbar() {
             </MenubarContent>
           </MenubarMenu>
 
-          {/* CART */}
-          <MenubarMenu>
-            <Link href="/cart">
-              <MenubarTrigger className="gap-2 cursor-pointer">
-                <ShoppingCartIcon size={16} />
-                Cart
-              </MenubarTrigger>
-            </Link>
-          </MenubarMenu>
+          {/* WISHLIST (Only if logged in) */}
+          {session && (
+            <MenubarMenu>
+              <Link href="/wishlist">
+                <MenubarTrigger className="gap-2 cursor-pointer">
+                  <HeartIcon size={16} />
+                  Wishlist
+                  {wishlist.length > 0 && (
+                    <span className="ml-1 px-1.5 py-0.5 text-[10px] bg-primary text-primary-foreground rounded-full">
+                      {wishlist.length}
+                    </span>
+                  )}
+                </MenubarTrigger>
+              </Link>
+            </MenubarMenu>
+          )}
+
+          {/* CART (Only if logged in) */}
+          {session && (
+            <MenubarMenu>
+              <Link href="/cart">
+                <MenubarTrigger className="gap-2 cursor-pointer">
+                  <ShoppingCartIcon size={16} />
+                  Cart
+                  {totalItems > 0 && (
+                    <span className="ml-1 px-1.5 py-0.5 text-[10px] bg-primary text-primary-foreground rounded-full">
+                      {totalItems}
+                    </span>
+                  )}
+                </MenubarTrigger>
+              </Link>
+            </MenubarMenu>
+          )}
         </Menubar>
 
         {/* RIGHT – AUTH & MOBILE TOGGLE */}
@@ -221,13 +251,39 @@ export function Navbar() {
                     )}
                   </div>
 
-                  {/* Cart Link */}
-                  <Link
-                    href="/cart"
-                    className="flex items-center gap-2 text-base font-medium p-3 hover:bg-accent rounded-md transition-colors mt-2"
-                  >
-                    <ShoppingCartIcon size={20} /> Cart
-                  </Link>
+                  {/* Wishlist Link (Only if logged in) */}
+                  {session && (
+                    <Link
+                      href="/wishlist"
+                      className="flex items-center justify-between gap-2 text-base font-medium p-3 hover:bg-accent rounded-md transition-colors mt-2"
+                    >
+                      <span className="flex items-center gap-2">
+                        <HeartIcon size={20} /> Wishlist
+                      </span>
+                      {wishlist.length > 0 && (
+                        <Badge variant="default" className="rounded-full px-2 h-5 text-[10px]">
+                          {wishlist.length}
+                        </Badge>
+                      )}
+                    </Link>
+                  )}
+
+                  {/* Cart Link (Only if logged in) */}
+                  {session && (
+                    <Link
+                      href="/cart"
+                      className="flex items-center justify-between gap-2 text-base font-medium p-3 hover:bg-accent rounded-md transition-colors mt-2"
+                    >
+                      <span className="flex items-center gap-2">
+                        <ShoppingCartIcon size={20} /> Cart
+                      </span>
+                      {totalItems > 0 && (
+                        <Badge variant="default" className="rounded-full px-2 h-5 text-[10px]">
+                          {totalItems}
+                        </Badge>
+                      )}
+                    </Link>
+                  )}
 
                   <div className="border-t my-3" />
 
@@ -238,10 +294,10 @@ export function Navbar() {
                         {session.user?.name || session.user?.email}
                       </div>
                       <Link
-                        href="/dashboard"
+                        href="/account"
                         className="flex items-center gap-2 text-base font-medium p-3 hover:bg-accent rounded-md transition-colors"
                       >
-                        <LayoutDashboardIcon size={20} /> Dashboard
+                        <LayoutDashboardIcon size={20} /> Account
                       </Link>
                       {/* @ts-ignore */}
                       {session.user?.role === "ADMIN" && (

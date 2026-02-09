@@ -18,9 +18,11 @@ export type Category = {
 export type Product = {
   id: string
   name: string
+  slug?: string
   subtitle: string
   price: number
   inStock: boolean
+  image?: string
 }
 
 

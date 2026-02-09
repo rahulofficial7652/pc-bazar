@@ -33,6 +33,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
 
+import { useCart } from "@/hooks/useCart";
+import { useWishlist } from "@/hooks/useWishlist";
+
 export default function ProductDetailPage() {
     const params = useParams();
     const router = useRouter();
@@ -43,7 +46,11 @@ export default function ProductDetailPage() {
     const [selectedImage, setSelectedImage] = useState(0);
     const [quantity, setQuantity] = useState(1);
 
+    const { addToCart } = useCart();
+    const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+
     useEffect(() => {
+        // ... existing fetch logic
         const fetchProduct = async () => {
             setLoading(true);
             try {
@@ -68,6 +75,8 @@ export default function ProductDetailPage() {
         }
     }, [slug, router]);
 
+    // ... existing loading check
+
     if (loading) {
         return (
             <div className="container mx-auto px-4 py-24 flex items-center justify-center min-h-screen">
@@ -86,10 +95,11 @@ export default function ProductDetailPage() {
             : 0;
 
     const finalPrice = product.discountPrice || product.price;
+    const isWishlisted = isInWishlist(product._id);
 
     return (
         <div className="min-h-screen bg-background">
-            {/* Breadcrumb */}
+            {/* Breadcrumb ... (unchanged) */}
             <div className="border-b">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <Link
@@ -106,7 +116,7 @@ export default function ProductDetailPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                     {/* Left Column - Images (5 cols) */}
                     <div className="lg:col-span-5 space-y-4">
-                        {/* Main Image */}
+                        {/* Main Image ... (unchanged) */}
                         <div className="sticky top-4">
                             <div className="relative aspect-square rounded-lg overflow-hidden border bg-card">
                                 {product.images && product.images.length > 0 ? (
@@ -131,7 +141,7 @@ export default function ProductDetailPage() {
                                 )}
                             </div>
 
-                            {/* Thumbnail Images */}
+                            {/* Thumbnail Images ... (unchanged) */}
                             {product.images && product.images.length > 1 && (
                                 <div className="grid grid-cols-5 gap-2 mt-4">
                                     {product.images.map((image, index) => (
@@ -156,16 +166,22 @@ export default function ProductDetailPage() {
 
                             {/* Action Buttons */}
                             <div className="flex gap-2 mt-4">
-                                <Button className="flex-1" size="lg">
+                                <Button
+                                    className="flex-1"
+                                    size="lg"
+                                    onClick={() => addToCart(product._id, quantity)}
+                                    disabled={product.stock <= 0}
+                                >
                                     <ShoppingCart className="mr-2 h-5 w-5" />
-                                    Add to Cart
+                                    {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
                                 </Button>
                                 <Button
                                     variant="outline"
                                     size="lg"
-                                    onClick={() => toast.success("Added to wishlist!")}
+                                    onClick={() => isWishlisted ? removeFromWishlist(product._id) : addToWishlist(product)}
+                                    className={isWishlisted ? "text-red-500 border-red-200 bg-red-50 hover:bg-red-100" : ""}
                                 >
-                                    <Heart className="h-5 w-5" />
+                                    <Heart className={`h-5 w-5 ${isWishlisted ? "fill-current" : ""}`} />
                                 </Button>
                                 <Button
                                     variant="outline"

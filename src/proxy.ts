@@ -15,7 +15,7 @@ export default withAuth(
              if (token?.role === "ADMIN") {
                  return NextResponse.redirect(new URL("/admin", req.url));
              }
-             return NextResponse.redirect(new URL("/dashboard", req.url));
+             return NextResponse.redirect(new URL("/account", req.url));
         }
         return null; // Allow access to login/signup if not logged in
     }
@@ -25,7 +25,7 @@ export default withAuth(
         // @ts-ignore
         if (token?.role !== "ADMIN") {
              // Redirect regular users to their dashboard if they try to access admin
-             return NextResponse.redirect(new URL("/dashboard", req.url));
+             return NextResponse.redirect(new URL("/account", req.url));
         }
     }
     
@@ -39,5 +39,5 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ["/admin/:path*", "/dashboard/:path*", "/login", "/signup"],
+  matcher: ["/admin/:path*", "/account/:path*", "/login", "/signup"],
 };

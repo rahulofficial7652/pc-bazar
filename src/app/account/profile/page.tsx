@@ -55,9 +55,9 @@ export default function ProfilePage() {
                     <CardDescription>Update your profile picture</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="flex items-center gap-6">
-                        <Avatar className="h-24 w-24">
-                            <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
+                    <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
+                        <Avatar className="h-20 w-20 md:h-24 md:w-24">
+                            <AvatarFallback className="bg-primary text-primary-foreground text-xl md:text-2xl">
                                 {session?.user?.name ? getInitials(session.user.name) : "U"}
                             </AvatarFallback>
                         </Avatar>

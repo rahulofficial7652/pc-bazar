@@ -50,7 +50,7 @@ export default function LoginForm({
         toast.error("Invalid credentials");
       } else {
         toast.success("Logged in successfully");
-        router.push("/admin"); // Redirect to admin or dashboard
+        router.push("/account");
         router.refresh();
       }
     } catch (error) {
@@ -103,7 +103,7 @@ export default function LoginForm({
                       {loading ? "Logging in..." : "Login"}
                     </Button>
                   </Field>
-                  
+
                   <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
                     <span className="relative z-10 bg-card px-2 text-muted-foreground italic">
                       Or
@@ -111,24 +111,24 @@ export default function LoginForm({
                   </div>
 
                   <Field>
-                    <Button 
-                      variant="outline" 
-                      type="button" 
-                      className="w-full" 
-                      onClick={() => signIn("google", { callbackUrl: "/admin" })}
+                    <Button
+                      variant="outline"
+                      type="button"
+                      className="w-full"
+                      onClick={() => signIn("google", { callbackUrl: "/account" })}
                     >
                       Login with Google
                     </Button>
                   </Field>
 
-                    <div className="mt-2 text-center text-sm"> {/* Spacing for signup link */}
-                        <FieldDescription className="text-center">
-                        Don&apos;t have an account?{" "}
-                        <Link href="/signup" className="underline text-primary">
-                            Sign up
-                        </Link>
-                        </FieldDescription>
-                    </div>
+                  <div className="mt-2 text-center text-sm"> {/* Spacing for signup link */}
+                    <FieldDescription className="text-center">
+                      Don&apos;t have an account?{" "}
+                      <Link href="/signup" className="underline text-primary">
+                        Sign up
+                      </Link>
+                    </FieldDescription>
+                  </div>
                 </FieldGroup>
               </form>
             </CardContent>

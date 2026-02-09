@@ -73,29 +73,40 @@ export const authOptions: NextAuthOptions = {
     },
     callbacks: {
         async signIn({ user, account, profile }) {
-            if (account?.provider === "google") {
-                try {
-                    const { connectDB } = await import("@/lib/db");
-                    const User = (await import("@/models/user")).default;
-                    await connectDB();
+            try {
+                const { connectDB } = await import("@/lib/db");
+                const User = (await import("@/models/user")).default;
+                await connectDB();
 
+                if (account?.provider === "google") {
                     const existingUser = await User.findOne({ email: user.email });
                     if (!existingUser) {
                         await User.create({
                             email: user.email,
+                            name: user.name,
                             image: user.image,
                             googleId: profile?.sub || user.id,
                             role: "USER"
                         });
                     }
-                    return true;
-                } catch (error) {
-                    const { logger } = await import("@/lib/utils/logger");
-                    logger.apiError("GoogleSignInCallback", error);
-                    return false;
+                } else if (account?.provider === "credentials") {
+                    // Ensure credentials users (including static admin) have a DB entry
+                    const existingUser = await User.findOne({ email: user.email });
+                    if (!existingUser) {
+                        await User.create({
+                            email: user.email,
+                            name: user.name || "Admin",
+                            role: (user as any).role || "USER",
+                            password: "EXTERNAL_AUTH_BYPASS" // Placeholder for external/static accounts
+                        });
+                    }
                 }
+                return true;
+            } catch (error) {
+                const { logger } = await import("@/lib/utils/logger");
+                logger.apiError("SignInCallback", error);
+                return false;
             }
-            return true;
         },
         async jwt({ token, user, account }) {
             if (user) {

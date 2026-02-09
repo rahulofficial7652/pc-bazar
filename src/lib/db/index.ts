@@ -34,40 +34,36 @@ export async function connectDB() {
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
-      serverSelectionTimeoutMS: 5000, // 5 seconds mein fail ho jaye agar DB nahi mil raha
-      heartbeatFrequencyMS: 10000, // Har 10s mein connection check kare
     };
 
     console.log("⏳ Connecting to MongoDB...");
     const startTime = Date.now();
 
-    cached.promise = mongoose
-      .connect(MONGODB_URI, opts)
-      .then((mongooseInstance) => {
-        const duration = Date.now() - startTime;
+    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongooseInstance) => {
+      const duration = Date.now() - startTime;
 
-        // 🐢 Slow DB connect signal
-        const connectionDuration = Date.now() - startTime;
-        if (connectionDuration > 2000) {
-          console.warn("🐢 SLOW_DB_CONNECTION", {
-            connectionDuration,
-            threshold: "2000ms",
-          });
-        }
-
-        console.log(`✅ MongoDB Connected Successfully (${duration}ms)`);
-
-        // Connection events for deeper monitoring
-        mongoose.connection.on("error", (err) => {
-          console.error("❌ MongoDB Runtime Error:", err);
+      // 🐢 Slow DB connect signal
+      const connectionDuration = Date.now() - startTime;
+      if (connectionDuration > 2000) {
+        console.warn("🐢 SLOW_DB_CONNECTION", {
+          connectionDuration,
+          threshold: "2000ms",
         });
+      }
 
-        mongoose.connection.on("disconnected", () => {
-          console.warn("⚠️ MongoDB Disconnected! Attempting to reconnect...");
-        });
+      console.log(`✅ MongoDB Connected Successfully (${duration}ms)`);
 
-        return mongooseInstance;
-      })
+      // Connection events for deeper monitoring
+      mongoose.connection.on("error", (err) => {
+        console.error("❌ MongoDB Runtime Error:", err);
+      });
+
+      mongoose.connection.on("disconnected", () => {
+        console.warn("⚠️ MongoDB Disconnected! Attempting to reconnect...");
+      });
+
+      return mongooseInstance;
+    })
       .catch((error) => {
         const duration = Date.now() - startTime;
         console.error(`❌ MongoDB Connection Failed after ${duration}ms`);

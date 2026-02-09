@@ -69,23 +69,23 @@ export function AccountSidebar() {
 
     return (
         <Card>
-            <CardHeader className="border-b">
+            <CardHeader className="p-4 md:p-6 border-b">
                 <div className="flex items-center gap-3">
-                    <Avatar className="h-12 w-12">
+                    <Avatar className="h-10 w-10 md:h-12 md:w-12">
                         <AvatarFallback className="bg-primary text-primary-foreground">
                             {session?.user?.name ? getInitials(session.user.name) : "U"}
                         </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                        <p className="font-semibold truncate">{session?.user?.name}</p>
-                        <p className="text-xs text-muted-foreground truncate">
+                        <p className="font-semibold text-sm md:text-base truncate">{session?.user?.name}</p>
+                        <p className="text-[10px] md:text-xs text-muted-foreground truncate">
                             {session?.user?.email}
                         </p>
                     </div>
                 </div>
             </CardHeader>
             <CardContent className="p-0">
-                <nav className="flex flex-col">
+                <nav className="flex flex-row md:flex-col overflow-x-auto scrollbar-hide md:overflow-visible border-b md:border-b-0">
                     {sidebarItems.map((item) => {
                         const Icon = item.icon;
                         const isActive = pathname === item.url;
@@ -95,13 +95,13 @@ export function AccountSidebar() {
                                 key={item.url}
                                 href={item.url}
                                 className={cn(
-                                    "flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors hover:bg-accent",
+                                    "flex items-center gap-2 md:gap-3 px-4 py-3 text-xs md:text-sm font-medium transition-colors hover:bg-accent whitespace-nowrap",
                                     isActive
-                                        ? "bg-accent text-accent-foreground border-l-4 border-primary"
+                                        ? "bg-accent text-accent-foreground border-b-2 md:border-b-0 md:border-l-4 border-primary"
                                         : "text-muted-foreground"
                                 )}
                             >
-                                <Icon className="h-4 w-4" />
+                                <Icon className="h-4 w-4 shrink-0" />
                                 {item.title}
                             </Link>
                         );
@@ -109,10 +109,10 @@ export function AccountSidebar() {
 
                     <button
                         onClick={handleLogout}
-                        className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground border-t mt-2"
+                        className="flex items-center gap-2 md:gap-3 px-4 py-3 text-xs md:text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground border-l md:border-l-0 md:border-t md:mt-2 whitespace-nowrap ml-auto md:ml-0"
                     >
-                        <LogOut className="h-4 w-4" />
-                        Logout
+                        <LogOut className="h-4 w-4 shrink-0" />
+                        <span className="md:inline">Logout</span>
                     </button>
                 </nav>
             </CardContent>
