@@ -95,6 +95,23 @@ export default function SignupForm({
                       <FieldLabel htmlFor="password">Password</FieldLabel>
                     </div>
                     <Input id="password" name="password" type="password" required />
+                    <div className="flex items-center gap-2">
+                      <input
+                        id="show-password"
+                        type="checkbox"
+                        className="h-4 w-4 rounded border-input"
+                        onChange={(e) => {
+                          const input = document.getElementById("password") as HTMLInputElement;
+                          if (input) input.type = e.target.checked ? "text" : "password";
+                        }}
+                      />
+                      <label
+                        htmlFor="show-password"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        Show password
+                      </label>
+                    </div>
                   </Field>
                   <Field>
                     <Button type="submit" className="w-full" disabled={loading}>

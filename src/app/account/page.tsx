@@ -24,9 +24,11 @@ import {
     Truck,
 } from "lucide-react";
 
+import { useRouter } from "next/navigation";
+
 export default function AccountDashboard() {
-    // ... (logic remains same)
     const { data: session } = useSession();
+    const router = useRouter();
     const [stats, setStats] = useState({
         orders: 0,
         wishlist: 0,

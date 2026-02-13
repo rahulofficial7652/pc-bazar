@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner"; // Assuming sonner is installed as per package.json
@@ -50,7 +50,14 @@ export default function LoginForm({
         toast.error("Invalid credentials");
       } else {
         toast.success("Logged in successfully");
-        router.push("/account");
+
+        // Fetch session to check role
+        const session = await getSession();
+        if (session?.user && (session.user as any).role === "ADMIN") {
+          router.push("/admin");
+        } else {
+          router.push("/account");
+        }
         router.refresh();
       }
     } catch (error) {
@@ -82,7 +89,7 @@ export default function LoginForm({
                       id="email"
                       name="email"
                       type="email"
-                      placeholder="admin@example.com"
+                      placeholder="example@gmail.com"
                       required
                     />
                   </Field>
@@ -96,8 +103,33 @@ export default function LoginForm({
                         Forgot your password?
                       </Link>
                     </div>
-                    <Input id="password" name="password" type="password" required />
+                    <Input
+                      id="password"
+                      name="password"
+                      type="password"
+                      placeholder="Enter your password"
+                      required
+                    />
                   </Field>
+                  <div className="flex items-center gap-2">
+                    <input
+                      id="show-password"
+                      type="checkbox"
+                      className="h-4 w-4 rounded border-input"
+                      onChange={(e) => {
+                        const input = document.getElementById("password") as HTMLInputElement;
+                        if (input) input.type = e.target.checked ? "text" : "password";
+                      }}
+                    />
+                    <label
+                      htmlFor="show-password"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      Show password
+                    </label>
+                  </div>
+                   
+
                   <Field>
                     <Button type="submit" className="w-full" disabled={loading}>
                       {loading ? "Logging in..." : "Login"}

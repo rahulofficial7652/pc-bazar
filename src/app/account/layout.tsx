@@ -16,9 +16,11 @@ export default function AccountLayout({
 
     useEffect(() => {
         if (status === "unauthenticated") {
-            router.push("/auth/signin?callbackUrl=/account");
+            router.push("/login?callbackUrl=/account");
+        } else if (status === "authenticated" && (session?.user as any)?.role === "ADMIN") {
+            router.push("/admin");
         }
-    }, [status, router]);
+    }, [status, session, router]);
 
     if (status === "loading") {
         return (
