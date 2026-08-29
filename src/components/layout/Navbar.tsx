@@ -40,7 +40,7 @@ export function Navbar() {
   const { wishlist } = useWishlist();
 
   return (
-    <header className="w-full border-b fixed top-0 z-50 shadow-sm bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="w-full border-b fixed top-0 z-50 shadow-sm bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 h-14 flex items-center justify-between">
 
         {/* LEFT – LOGO */}
@@ -68,28 +68,34 @@ export function Navbar() {
               <PackageIcon size={16} />
               Categories
             </MenubarTrigger>
-            <MenubarContent>
+
+            <MenubarContent className="max-h-[50vh] overflow-y-auto md:max-h-80">
               <MenubarGroup>
                 {categoriesLoading ? (
-                  <MenubarItem disabled>Loading categories...</MenubarItem>
+                    <MenubarItem disabled>
+                      Loading categories...
+                    </MenubarItem>
                 ) : categories.length === 0 ? (
-                  <MenubarItem disabled>No categories available</MenubarItem>
+                    <MenubarItem disabled>
+                      No categories available
+                    </MenubarItem>
                 ) : (
-                  categories.map((category) => (
-                    <Link
-                      key={category._id}
-                      href={`/collection/category/${category.slug}`}
-                    >
-                      <MenubarItem className="gap-2">
-                        <PackageIcon size={14} />
-                        {category.name}
-                      </MenubarItem>
-                    </Link>
-                  ))
+                    categories.map((category) => (
+                        <Link
+                            key={category._id}
+                            href={`/collection/category/${category.slug}`}
+                        >
+                          <MenubarItem className="gap-2">
+                            <PackageIcon size={14} />
+                            {category.name}
+                          </MenubarItem>
+                        </Link>
+                    ))
                 )}
               </MenubarGroup>
             </MenubarContent>
           </MenubarMenu>
+
 
           {/* WISHLIST (Only if logged in) */}
           {session && (

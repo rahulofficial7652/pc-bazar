@@ -3,7 +3,6 @@ import { FeaturedProducts } from "@/components/home/FeaturedProducts"
 import Link from "next/link"
 import { connectDB } from "@/lib/db";
 import { Product as ProductModel } from "@/models/product";
-import { Product } from "@/lib/home";
 
 export const dynamic = 'force-dynamic';
 
@@ -30,7 +29,7 @@ export default async function HomePage() {
       {/* Hero Section - Simplified and Static */}
       <section className="relative overflow-hidden bg-background">
         {/* soft background glow */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-primary/10" />
+        <div className="absolute inset-0 bg-linear-to-r from-primary/10 via-transparent to-primary/10" />
 
         <div className="relative mx-auto max-w-7xl px-6 py-24 grid md:grid-cols-2 gap-12 items-center">
           {/* LEFT CONTENT */}
@@ -47,7 +46,7 @@ export default async function HomePage() {
             </h1>
 
             <p className="mt-6 max-w-md text-muted-foreground">
-              We've redesigned our website to offer faster performance and a cleaner shopping experience.
+              We&#39;ve redesigned our website to offer faster performance and a cleaner shopping experience.
             </p>
 
             <div className="mt-8 flex gap-4">
@@ -56,23 +55,25 @@ export default async function HomePage() {
                   Shop Now
                 </Button>
               </Link>
-              <Link href="#">
+              <a href="#featuredProducts">
                 <Button size="lg" variant="outline">
                   Explore
                 </Button>
-              </Link>
+              </a>
             </div>
           </div>
 
           {/* RIGHT VISUAL */}
-          <div className="relative h-[320px] rounded-xl border bg-card shadow-sm" >
+          <div className="relative h-80 rounded-xl border bg-card shadow-sm" >
 
           </div>
 
         </div>
       </section>
 
-      <FeaturedProducts data={products} />
+      <section id="featuredProducts">
+        <FeaturedProducts data={products} />
+      </section>
     </main>
   )
 }
